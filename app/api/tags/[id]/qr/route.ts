@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import QRCode from "qrcode";
 
-import { getDemoStore } from "@/lib/demo-store";
+import { getAppStore } from "@/lib/data-store";
 import { getSessionUser } from "@/lib/session";
 import { getAppUrl } from "@/lib/utils";
 
@@ -12,7 +12,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   }
 
   const { id } = await params;
-  const store = await getDemoStore();
+  const store = await getAppStore();
   const tag = store.tags.find((item) => item.id === id);
   if (!tag) {
     return NextResponse.json({ error: "Tag not found" }, { status: 404 });

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { SmartPageLayout } from "@/components/smart-page";
-import { getBusinessById, getBusinessPromotions, getTagByCode, getTagBusinessLinks, recordInteraction } from "@/lib/demo-store";
+import { getBusinessById, getBusinessPromotions, getTagByCode, getTagBusinessLinks, recordInteraction } from "@/lib/data-store";
 
 export default async function SmartTagPage({
   params,

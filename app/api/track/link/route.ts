@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getDemoStore, recordInteraction } from "@/lib/demo-store";
+import { getAppStore, recordInteraction } from "@/lib/data-store";
 import { isSafeExternalUrl } from "@/lib/utils";
 
 export async function GET(request: Request) {
@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Missing linkId" }, { status: 400 });
   }
 
-  const store = await getDemoStore();
+  const store = await getAppStore();
   const link = store.links.find((item) => item.id === linkId && item.active);
   if (!link) {
     return NextResponse.json({ error: "Link not found" }, { status: 404 });

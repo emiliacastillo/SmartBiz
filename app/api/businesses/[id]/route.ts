@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { deleteBusiness, getBusinessById, updateBusiness } from "@/lib/demo-store";
+import { deleteBusiness, getBusinessById, updateBusiness } from "@/lib/data-store";
 import { getSessionUser } from "@/lib/session";
 import { businessSchema } from "@/lib/validators";
 

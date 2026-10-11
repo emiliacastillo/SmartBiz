@@ -6,14 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BusinessAdministrationControls } from "@/components/admin-crud-controls";
 import { BusinessTagManager, CreateBusinessForm } from "@/components/platform-admin-manager";
 import { countAllInteractions } from "@/lib/analytics";
-import { getDemoStore } from "@/lib/demo-store";
+import { getAppStore } from "@/lib/data-store";
 import { getSessionUser } from "@/lib/session";
 
 export default async function AdminPage() {
   const user = await getSessionUser();
   if (!user || user.role !== "admin") redirect("/login");
 
-  const [store, interactionCount] = await Promise.all([getDemoStore(), countAllInteractions()]);
+  const [store, interactionCount] = await Promise.all([getAppStore(), countAllInteractions()]);
   const businesses = store.businesses;
   const tagsByBusinessId = new Map<string, typeof store.tags>();
   for (const tag of store.tags) {

@@ -1,13 +1,15 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { getDemoStore } from "@/lib/demo-store";
+import { getAppStore } from "@/lib/data-store";
 import { getAppUrl } from "@/lib/utils";
 
 export default async function HomePage() {
-  const store = await getDemoStore();
+  await connection();
+  const store = await getAppStore();
   const businesses = store.businesses;
   const activeTags = store.tags.filter((tag) => tag.active);
   const tagsByBusinessId = new Map<string, typeof activeTags>();

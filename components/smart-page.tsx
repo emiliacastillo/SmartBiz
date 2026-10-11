@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import type { BusinessRecord, BusinessLinkRecord, PromotionRecord } from "@/lib/demo-store";
+import type { BusinessRecord, BusinessLinkRecord, PromotionRecord } from "@/lib/data-store";
 import { ArrowUpRight, MapPin, Phone, Star, Globe, Sparkles, CalendarClock, Link2, Utensils, MessageCircle, Gift, CalendarCheck2, Scissors } from "lucide-react";
 
 const iconMap: Record<string, typeof Link2> = {

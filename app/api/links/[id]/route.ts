@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { deleteLink, updateLink } from "@/lib/demo-store";
+import { deleteLink, updateLink } from "@/lib/data-store";
 import { getSessionUser } from "@/lib/session";
 import { linkSchema } from "@/lib/validators";
 

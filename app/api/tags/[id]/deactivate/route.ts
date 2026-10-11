@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getDemoStore, updateTag } from "@/lib/demo-store";
+import { getAppStore, updateTag } from "@/lib/data-store";
 import { getSessionUser } from "@/lib/session";
 
 export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -10,7 +10,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
   }
 
   const { id } = await params;
-  const store = await getDemoStore();
+  const store = await getAppStore();
   const tag = store.tags.find((item) => item.id === id);
   if (!tag) {
     return NextResponse.json({ error: "Tag not found" }, { status: 404 });

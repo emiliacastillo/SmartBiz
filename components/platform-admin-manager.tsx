@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { TagAdministrationControls } from "@/components/admin-crud-controls";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { BusinessLinkRecord, BusinessRecord, SmartTagRecord } from "@/lib/demo-store";
+import type { BusinessLinkRecord, BusinessRecord, SmartTagRecord } from "@/lib/data-store";
 
 type BusinessFormData = {
   name: string;

@@ -5,7 +5,7 @@ import { Pencil, Plus, Trash2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { BusinessLinkRecord } from "@/lib/demo-store";
+import type { BusinessLinkRecord } from "@/lib/data-store";
 
 const linkTypes = [
   ["MENU", "Menu"],

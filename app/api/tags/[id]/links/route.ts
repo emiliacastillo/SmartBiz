@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getDemoStore, setSmartTagLinkAssignments } from "@/lib/demo-store";
+import { getAppStore, setSmartTagLinkAssignments } from "@/lib/data-store";
 import { getSessionUser } from "@/lib/session";
 import { smartTagLinkAssignmentSchema } from "@/lib/validators";
 
@@ -11,7 +11,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   }
 
   const { id } = await params;
-  const store = await getDemoStore();
+  const store = await getAppStore();
   const tag = store.tags.find((item) => item.id === id && item.active);
   if (!tag) return NextResponse.json({ error: "Active tag not found" }, { status: 404 });
 
@@ -36,7 +36,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const store = await getDemoStore();
+  const store = await getAppStore();
   const tag = store.tags.find((item) => item.id === id && item.active);
   if (!tag) return NextResponse.json({ error: "Active tag not found" }, { status: 404 });
 

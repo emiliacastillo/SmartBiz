@@ -9,7 +9,7 @@ A local-first SaaS MVP for NFC and QR smart business pages. The app includes a p
 - Business area: `/dashboard`
 - API routes: `/api/*`
 - Data model: Prisma schema in `prisma/schema.prisma`
-- Local demo store: `lib/demo-store.ts`
+- PostgreSQL data access: `lib/data-store.ts`
 
 ## Local setup
 
@@ -32,7 +32,7 @@ This starts PostgreSQL with the settings in `.env`:
 ```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/smartbiz?schema=public"
 DIRECT_URL="postgresql://postgres:postgres@localhost:5432/smartbiz?schema=public"
-DEMO_MODE="false"
+
 ```
 
 To confirm the container is running:
@@ -66,7 +66,7 @@ npx prisma generate
 npx prisma migrate dev --name init
 ```
 
-### 4) Seed the database with real demo data
+### 4) Seed the database with sample data
 
 ```bash
 npm run db:seed
@@ -74,16 +74,9 @@ npm run db:seed
 
 This loads a real set of sample businesses, links, tags, promotions, and interactions into PostgreSQL. The seed script is defined in `prisma/seed.js` and is configured in `prisma.config.ts`.
 
-### 5) Demo mode configuration
+### 5) Application configuration
 
-The app can be controlled via environment variables:
-
-```env
-DEMO_MODE="false"
-```
-
-- `true`: uses the in-memory demo store
-- `false`: uses the real PostgreSQL-backed app data
+The app always uses PostgreSQL through Prisma. Configure `DATABASE_URL` and apply migrations before starting the app. Sample data is optional and can be loaded with the seed command.
 
 Set `APP_URL` to the public origin used by the deployment so generated smart-tag URLs point to the deployed app. Locally, keep it as `http://localhost:3000`.
 
@@ -127,7 +120,7 @@ Expected version:
 v22.x
 ```
 
-## Demo login
+## Local admin login
 
 - Email: `admin@smartbiz.local`
 - Password: `admin123`
@@ -166,4 +159,4 @@ This document covers the public smart-page flow, admin management endpoints, QR 
 
 ## Notes
 
-This repository includes a Prisma schema for production deployment and a demo in-memory layer so the application remains usable without a live database during early local validation.
+A running PostgreSQL database is required for local development and deployment. Application data is persisted through Prisma; there is no in-memory fallback. Unit tests mock Prisma and do not require a live database.

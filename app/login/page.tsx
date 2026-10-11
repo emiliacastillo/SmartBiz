@@ -9,7 +9,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Sign in</CardTitle>
-          <CardDescription>Use the admin demo account to manage businesses and smart tags.</CardDescription>
+          <CardDescription>Use the admin account to manage businesses and smart tags.</CardDescription>
         </CardHeader>
         <form action="/api/login" method="POST">
           <CardContent className="space-y-4">

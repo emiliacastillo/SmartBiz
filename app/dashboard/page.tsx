@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BusinessLinkManager } from "@/components/business-link-manager";
-import { getBusinessLinks, getBusinessPromotions, getDemoStore } from "@/lib/demo-store";
+import { getAppStore, getBusinessLinks, getBusinessPromotions } from "@/lib/data-store";
 import { aggregateBusinessAnalytics } from "@/lib/analytics";
 import { getSessionUser } from "@/lib/session";
 
@@ -12,7 +12,7 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
   if (!user) redirect("/login");
 
   const params = searchParams ? await searchParams : {};
-  const store = await getDemoStore();
+  const store = await getAppStore();
   const businesses = user.role === "admin" ? store.businesses : store.businesses.filter((business) => business.id === user.businessId);
   const businessId = user.role === "admin" ? params.businessId ?? businesses[0]?.id : user.businessId;
   const business = businesses.find((item) => item.id === businessId);

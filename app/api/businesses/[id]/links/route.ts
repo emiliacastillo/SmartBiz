@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { createLink, getBusinessLinks } from "@/lib/demo-store";
+import { createLink, getBusinessLinks } from "@/lib/data-store";
 import { getSessionUser } from "@/lib/session";
 import { linkSchema } from "@/lib/validators";
 

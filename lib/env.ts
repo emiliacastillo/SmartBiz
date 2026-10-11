@@ -7,14 +7,6 @@ const envSchema = z.object({
   ADMIN_EMAIL: z.string().default("admin@smartbiz.local"),
   ADMIN_PASSWORD: z.string().default("admin123"),
   APP_URL: z.string().default("http://localhost:3000"),
-  DEMO_MODE: z.string().default("true"),
 });
 
-export const appEnv = envSchema.parse({
-  ...process.env,
-  DEMO_MODE: process.env.DEMO_MODE ?? "true",
-});
-
-export function isDemoModeEnabled() {
-  return ["true", "1", "yes", "on"].includes((process.env.DEMO_MODE ?? appEnv.DEMO_MODE ?? "true").toLowerCase());
-}
+export const appEnv = envSchema.parse(process.env);

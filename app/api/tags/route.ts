@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { createTag, getDemoStore } from "@/lib/demo-store";
+import { createTag, getAppStore } from "@/lib/data-store";
 import { getSessionUser } from "@/lib/session";
 import { tagSchema } from "@/lib/validators";
 
@@ -10,7 +10,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const store = await getDemoStore();
+  const store = await getAppStore();
   return NextResponse.json(store.tags);
 }
 

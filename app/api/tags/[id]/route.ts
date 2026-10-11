@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { deleteTag, getDemoStore, updateTag } from "@/lib/demo-store";
+import { deleteTag, getAppStore, updateTag } from "@/lib/data-store";
 import { getSessionUser } from "@/lib/session";
 import { tagSchema } from "@/lib/validators";
 
@@ -11,7 +11,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   }
 
   const { id } = await params;
-  const store = await getDemoStore();
+  const store = await getAppStore();
   const tag = store.tags.find((item) => item.id === id);
   if (!tag) {
     return NextResponse.json({ error: "Tag not found" }, { status: 404 });
@@ -28,7 +28,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   const { id } = await params;
   const payload = await request.json();
-  const store = await getDemoStore();
+  const store = await getAppStore();
   const existingTag = store.tags.find((item) => item.id === id);
   if (!existingTag) {
     return NextResponse.json({ error: "Tag not found" }, { status: 404 });
@@ -50,7 +50,7 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
   }
 
   const { id } = await params;
-  const store = await getDemoStore();
+  const store = await getAppStore();
   if (!store.tags.some((tag) => tag.id === id)) {
     return NextResponse.json({ error: "Tag not found" }, { status: 404 });
   }

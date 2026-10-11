@@ -1,7 +1,5 @@
 import { Prisma } from "@prisma/client";
 
-import { isDemoModeEnabled } from "@/lib/env";
-import { getDemoStore } from "@/lib/demo-store";
 import { prisma } from "@/lib/prisma";
 
 const allowedDayRanges = [7, 30, 90] as const;
@@ -56,43 +54,6 @@ export async function aggregateBusinessAnalytics(businessId: string, requestedDa
   const days = normalizeDayRange(requestedDays);
   const { startAt, endAt } = makeDateWindow(days);
 
-  if (isDemoModeEnabled()) {
-    const store = await getDemoStore();
-    const interactions = store.interactions.filter((item) => {
-      const createdAt = new Date(item.createdAt);
-      return item.businessId === businessId && createdAt >= startAt && createdAt < endAt;
-    });
-    const byDate = new Map(makeDailySeries(startAt, days).map((day) => [day.date, day]));
-
-    for (const interaction of interactions) {
-      const dateKey = interaction.createdAt.slice(0, 10);
-      const daily = byDate.get(dateKey);
-      if (!daily) continue;
-      if (interaction.eventType === "PAGE_VIEW") daily.pageViews += 1;
-      if (interaction.eventType === "LINK_CLICK") daily.linkClicks += 1;
-      if (interaction.eventType === "PROMOTION_CLICK") daily.promotionClicks += 1;
-    }
-
-    return buildAnalyticsResult(
-      interactions.reduce<Partial<Record<EventName, number>>>((counts, item) => {
-        counts[item.eventType] = (counts[item.eventType] ?? 0) + 1;
-        return counts;
-      }, {}),
-      interactions.reduce<Partial<Record<SourceName, number>>>((counts, item) => {
-        counts[item.source] = (counts[item.source] ?? 0) + 1;
-        return counts;
-      }, {}),
-      Array.from(byDate.values()),
-      interactions.reduce<Map<string, number>>((counts, item) => {
-        if (item.eventType === "LINK_CLICK" && item.businessLinkId) {
-          counts.set(item.businessLinkId, (counts.get(item.businessLinkId) ?? 0) + 1);
-        }
-        return counts;
-      }, new Map()),
-      store.links.map(({ id, label, url }) => ({ id, label, url })),
-    );
-  }
-
   const where = { businessId, createdAt: { gte: startAt, lt: endAt } };
   const [eventGroups, sourceGroups, dailyRows, linkGroups] = await Promise.all([
     prisma.interaction.groupBy({ by: ["eventType"], where, _count: { _all: true } }),
@@ -135,7 +96,6 @@ export async function aggregateBusinessAnalytics(businessId: string, requestedDa
 }
 
 export async function countAllInteractions() {
-  if (isDemoModeEnabled()) return (await getDemoStore()).interactions.length;
   return prisma.interaction.count();
 }
 
