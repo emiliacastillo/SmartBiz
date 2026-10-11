@@ -10,6 +10,16 @@ type EventName = "PAGE_VIEW" | "LINK_CLICK" | "PROMOTION_CLICK";
 type SourceName = "NFC" | "QR" | "UNKNOWN";
 type DailyMetrics = { date: string; pageViews: number; linkClicks: number; promotionClicks: number };
 
+export type BusinessAnalytics = {
+  totalPageViews: number;
+  totalLinkClicks: number;
+  totalPromotions: number;
+  clickThroughRate: number;
+  byDate: DailyMetrics[];
+  bySource: { source: SourceName; events: number }[];
+  mostClickedLinks: { linkId: string; label: string; url: string; count: number }[];
+};
+
 function normalizeDayRange(value: number): DayRange {
   return allowedDayRanges.includes(value as DayRange) ? value as DayRange : 30;
 }
@@ -42,7 +52,7 @@ function makeSourceMetrics(counts: Partial<Record<SourceName, number>>) {
   }));
 }
 
-export async function aggregateBusinessAnalytics(businessId: string, requestedDays = 30) {
+export async function aggregateBusinessAnalytics(businessId: string, requestedDays = 30): Promise<BusinessAnalytics> {
   const days = normalizeDayRange(requestedDays);
   const { startAt, endAt } = makeDateWindow(days);
 
@@ -135,7 +145,7 @@ function buildAnalyticsResult(
   byDate: DailyMetrics[],
   linkCounts: Map<string, number>,
   links: Array<{ id: string; label: string; url: string }>,
-) {
+): BusinessAnalytics {
   const totalPageViews = counts.PAGE_VIEW ?? 0;
   const totalLinkClicks = counts.LINK_CLICK ?? 0;
 

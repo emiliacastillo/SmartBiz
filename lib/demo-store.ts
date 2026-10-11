@@ -299,7 +299,7 @@ async function getDbStore(): Promise<DemoStore> {
   };
 }
 
-export async function getDemoStore() {
+export async function getDemoStore(): Promise<DemoStore> {
   return isDemoModeEnabled() ? store : await getDbStore();
 }
 
