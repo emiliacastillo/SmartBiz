@@ -14,14 +14,15 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Missing linkId" }, { status: 400 });
   }
 
-  const link = getDemoStore().links.find((item) => item.id === linkId && item.active);
+  const store = await getDemoStore();
+  const link = store.links.find((item) => item.id === linkId && item.active);
   if (!link) {
     return NextResponse.json({ error: "Link not found" }, { status: 404 });
   }
 
-  const tag = tagCode ? getDemoStore().tags.find((item) => item.code === tagCode.toUpperCase()) : undefined;
+  const tag = tagCode ? store.tags.find((item) => item.code === tagCode.toUpperCase()) : undefined;
 
-  recordInteraction({
+  await recordInteraction({
     businessId: link.businessId,
     smartTagId: tag?.id,
     businessLinkId: link.id,

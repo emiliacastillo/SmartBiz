@@ -6,25 +6,25 @@ const openApiSpec = {
     title: "Smart Business Platform API",
     version: "1.0.0",
     description:
-      "API para gestionar negocios, tags inteligentes, enlaces, promociones y métricas del MVP de SmartBiz.",
+      "API for managing businesses, smart tags, links, promotions, and analytics for the SmartBiz MVP.",
   },
   servers: [
     { url: "http://localhost:3000", description: "Local development" },
     { url: "https://localhost:3000", description: "Preview" },
   ],
   tags: [
-    { name: "Auth", description: "Autenticación y sesiones de administrador" },
-    { name: "Businesses", description: "Gestión de negocios" },
-    { name: "Tags", description: "Tags inteligentes y QR" },
-    { name: "Links", description: "Enlaces de acceso directo" },
-    { name: "Tracking", description: "Registro de interacciones y clics" },
-    { name: "Analytics", description: "Métricas de negocio" },
+    { name: "Auth", description: "Administrator authentication and sessions" },
+    { name: "Businesses", description: "Business management" },
+    { name: "Tags", description: "Smart tags and QR codes" },
+    { name: "Links", description: "Direct-access links" },
+    { name: "Tracking", description: "Interaction and click tracking" },
+    { name: "Analytics", description: "Business metrics" },
   ],
   paths: {
     "/api/login": {
       post: {
         tags: ["Auth"],
-        summary: "Iniciar sesión de administrador",
+        summary: "Admin login",
         requestBody: {
           required: true,
           content: {
@@ -41,33 +41,33 @@ const openApiSpec = {
           },
         },
         responses: {
-          "302": { description: "Redirección al panel de administración" },
-          "303": { description: "Redirección con error de credenciales" },
+          "302": { description: "Redirect to the admin panel" },
+          "303": { description: "Redirect with invalid credentials" },
         },
       },
     },
     "/api/logout": {
       post: {
         tags: ["Auth"],
-        summary: "Cerrar sesión",
+        summary: "Log out",
         responses: {
-          "303": { description: "Redirección a la pantalla de login" },
+          "303": { description: "Redirect to the login screen" },
         },
       },
     },
     "/api/businesses": {
       get: {
         tags: ["Businesses"],
-        summary: "Listar negocios",
+        summary: "List businesses",
         security: [{ sessionAuth: [] }],
         responses: {
-          "200": { description: "Listado de negocios" },
-          "401": { description: "No autorizado" },
+          "200": { description: "List of businesses" },
+          "401": { description: "Unauthorized" },
         },
       },
       post: {
         tags: ["Businesses"],
-        summary: "Crear negocio",
+        summary: "Create business",
         security: [{ sessionAuth: [] }],
         requestBody: {
           required: true,
@@ -78,27 +78,27 @@ const openApiSpec = {
           },
         },
         responses: {
-          "201": { description: "Negocio creado" },
-          "400": { description: "Payload inválido" },
-          "401": { description: "No autorizado" },
+          "201": { description: "Business created" },
+          "400": { description: "Invalid payload" },
+          "401": { description: "Unauthorized" },
         },
       },
     },
     "/api/businesses/{id}": {
       get: {
         tags: ["Businesses"],
-        summary: "Obtener negocio por id",
+        summary: "Get business by id",
         parameters: [{ $ref: "#/components/parameters/BusinessId" }],
         security: [{ sessionAuth: [] }],
         responses: {
-          "200": { description: "Datos del negocio" },
-          "401": { description: "No autorizado" },
-          "404": { description: "Negocio no encontrado" },
+          "200": { description: "Business data" },
+          "401": { description: "Unauthorized" },
+          "404": { description: "Business not found" },
         },
       },
       patch: {
         tags: ["Businesses"],
-        summary: "Actualizar negocio",
+        summary: "Update business",
         parameters: [{ $ref: "#/components/parameters/BusinessId" }],
         security: [{ sessionAuth: [] }],
         requestBody: {
@@ -108,38 +108,38 @@ const openApiSpec = {
           },
         },
         responses: {
-          "200": { description: "Negocio actualizado" },
-          "400": { description: "Payload inválido" },
-          "401": { description: "No autorizado" },
-          "404": { description: "Negocio no encontrado" },
+          "200": { description: "Business updated" },
+          "400": { description: "Invalid payload" },
+          "401": { description: "Unauthorized" },
+          "404": { description: "Business not found" },
         },
       },
     },
     "/api/businesses/{id}/analytics": {
       get: {
         tags: ["Analytics"],
-        summary: "Obtener métricas del negocio",
+        summary: "Get business metrics",
         parameters: [{ $ref: "#/components/parameters/BusinessId" }],
         security: [{ sessionAuth: [] }],
         responses: {
-          "200": { description: "Métricas calculadas" },
-          "401": { description: "No autorizado" },
+          "200": { description: "Calculated metrics" },
+          "401": { description: "Unauthorized" },
         },
       },
     },
     "/api/tags": {
       get: {
         tags: ["Tags"],
-        summary: "Listar tags inteligentes",
+        summary: "List smart tags",
         security: [{ sessionAuth: [] }],
         responses: {
-          "200": { description: "Listado de tags" },
-          "401": { description: "No autorizado" },
+          "200": { description: "List of tags" },
+          "401": { description: "Unauthorized" },
         },
       },
       post: {
         tags: ["Tags"],
-        summary: "Crear tag",
+        summary: "Create tag",
         security: [{ sessionAuth: [] }],
         requestBody: {
           required: true,
@@ -148,27 +148,27 @@ const openApiSpec = {
           },
         },
         responses: {
-          "201": { description: "Tag creado" },
-          "400": { description: "Payload inválido" },
-          "401": { description: "No autorizado" },
+          "201": { description: "Tag created" },
+          "400": { description: "Invalid payload" },
+          "401": { description: "Unauthorized" },
         },
       },
     },
     "/api/tags/{id}": {
       get: {
         tags: ["Tags"],
-        summary: "Obtener tag por id",
+        summary: "Get tag by id",
         parameters: [{ $ref: "#/components/parameters/TagId" }],
         security: [{ sessionAuth: [] }],
         responses: {
-          "200": { description: "Datos del tag" },
-          "401": { description: "No autorizado" },
-          "404": { description: "Tag no encontrado" },
+          "200": { description: "Tag data" },
+          "401": { description: "Unauthorized" },
+          "404": { description: "Tag not found" },
         },
       },
       patch: {
         tags: ["Tags"],
-        summary: "Actualizar tag",
+        summary: "Update tag",
         parameters: [{ $ref: "#/components/parameters/TagId" }],
         security: [{ sessionAuth: [] }],
         requestBody: {
@@ -178,69 +178,69 @@ const openApiSpec = {
           },
         },
         responses: {
-          "200": { description: "Tag actualizado" },
-          "400": { description: "Payload inválido" },
-          "401": { description: "No autorizado" },
-          "404": { description: "Tag no encontrado" },
+          "200": { description: "Tag updated" },
+          "400": { description: "Invalid payload" },
+          "401": { description: "Unauthorized" },
+          "404": { description: "Tag not found" },
         },
       },
     },
     "/api/tags/{id}/qr": {
       get: {
         tags: ["Tags"],
-        summary: "Generar QR del tag",
+        summary: "Generate QR code for a tag",
         parameters: [{ $ref: "#/components/parameters/TagId" }],
         security: [{ sessionAuth: [] }],
         responses: {
-          "200": { description: "Imagen PNG del QR" },
-          "401": { description: "No autorizado" },
-          "404": { description: "Tag no encontrado" },
+          "200": { description: "PNG image of the QR code" },
+          "401": { description: "Unauthorized" },
+          "404": { description: "Tag not found" },
         },
       },
     },
     "/api/track/link": {
       get: {
         tags: ["Tracking"],
-        summary: "Registrar clic en enlace y redirigir",
+        summary: "Track a link click and redirect",
         parameters: [
           { name: "linkId", in: "query", required: true, schema: { type: "string" } },
           { name: "tagCode", in: "query", required: false, schema: { type: "string" } },
           { name: "source", in: "query", required: false, schema: { type: "string", enum: ["nfc", "qr", "unknown"] } },
         ],
         responses: {
-          "302": { description: "Redirección al destino del enlace" },
-          "400": { description: "Parámetros inválidos" },
-          "404": { description: "Enlace no encontrado" },
+          "302": { description: "Redirect to the link destination" },
+          "400": { description: "Invalid parameters" },
+          "404": { description: "Link not found" },
         },
       },
     },
     "/api/track/promotion": {
       get: {
         tags: ["Tracking"],
-        summary: "Registrar clic en promoción y redirigir",
+        summary: "Track a promotion click and redirect",
         parameters: [
           { name: "promoId", in: "query", required: true, schema: { type: "string" } },
           { name: "tagCode", in: "query", required: false, schema: { type: "string" } },
           { name: "source", in: "query", required: false, schema: { type: "string", enum: ["nfc", "qr", "unknown"] } },
         ],
         responses: {
-          "302": { description: "Redirección a la promoción" },
-          "400": { description: "Parámetros inválidos" },
-          "404": { description: "Promoción no encontrada" },
+          "302": { description: "Redirect to the promotion" },
+          "400": { description: "Invalid parameters" },
+          "404": { description: "Promotion not found" },
         },
       },
     },
     "/t/{code}": {
       get: {
         tags: ["Tracking"],
-        summary: "Resolver vista pública del tag smart",
+        summary: "Resolve a public smart tag page",
         parameters: [
           { name: "code", in: "path", required: true, schema: { type: "string" } },
           { name: "src", in: "query", required: false, schema: { type: "string", enum: ["qr", "nfc", "unknown"] } },
         ],
         responses: {
-          "200": { description: "Smart page del negocio" },
-          "404": { description: "Tag no existe o está inactivo" },
+          "200": { description: "Business smart page" },
+          "404": { description: "Tag does not exist or is inactive" },
         },
       },
     },

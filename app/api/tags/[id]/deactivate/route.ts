@@ -10,11 +10,12 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
   }
 
   const { id } = await params;
-  const tag = getDemoStore().tags.find((item) => item.id === id);
+  const store = await getDemoStore();
+  const tag = store.tags.find((item) => item.id === id);
   if (!tag) {
     return NextResponse.json({ error: "Tag not found" }, { status: 404 });
   }
 
-  const updated = updateTag(id, { active: false });
+  const updated = await updateTag(id, { active: false });
   return NextResponse.json(updated);
 }

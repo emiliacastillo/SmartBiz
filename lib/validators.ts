@@ -51,3 +51,7 @@ export const analyticsQuerySchema = z.object({
   startDate: z.string().optional(),
   endDate: z.string().optional(),
 });
+
+export const smartTagLinkAssignmentSchema = z.object({
+  linkIds: z.array(z.string().min(1)).max(100).refine((ids) => new Set(ids).size === ids.length),
+});

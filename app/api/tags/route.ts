@@ -10,7 +10,8 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  return NextResponse.json(getDemoStore().tags);
+  const store = await getDemoStore();
+  return NextResponse.json(store.tags);
 }
 
 export async function POST(request: Request) {
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const tag = createTag({
+  const tag = await createTag({
     ...parsed.data,
     code: parsed.data.code ?? Math.random().toString(36).slice(2, 8).toUpperCase(),
   });

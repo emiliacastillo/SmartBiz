@@ -1,3 +1,8 @@
+import { type Business, type BusinessLink, type Interaction, type Promotion, type SmartTag, EventType as PrismaEventType, LinkType as PrismaLinkType, SourceType as PrismaSourceType } from "@prisma/client";
+
+import { isDemoModeEnabled } from "@/lib/env";
+import { prisma } from "@/lib/prisma";
+
 export type BusinessRecord = {
   id: string;
   name: string;
@@ -64,6 +69,7 @@ export type DemoStore = {
   businesses: BusinessRecord[];
   tags: SmartTagRecord[];
   links: BusinessLinkRecord[];
+  tagLinkAssignments: { smartTagId: string; businessLinkId: string }[];
   promotions: PromotionRecord[];
   interactions: InteractionRecord[];
 };
@@ -73,15 +79,14 @@ const iso = (value: number) => new Date(value).toISOString();
 
 const demoBusinessOne: BusinessRecord = {
   id: "biz-1",
-  name: "Sunset Bistro",
-  slug: "sunset-bistro",
-  description: "A neighborhood bistro serving seasonal plates, handcrafted cocktails, and cozy evenings.",
-  logoUrl: "https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=200&q=80",
-  primaryColor: "#ea580c",
-  secondaryColor: "#fbbf24",
-  phone: "+1 (415) 555-0199",
-  address: "241 Harbor Way, San Francisco, CA",
-  website: "https://sunsetbistro.example",
+  name: "Columbia Restaurant - Ybor City",
+  slug: "columbia-restaurant-ybor-city",
+  description: "The original Columbia Restaurant in Tampa's historic Ybor City, serving Spanish and Cuban cuisine.",
+  primaryColor: "#8b1e24",
+  secondaryColor: "#d4a64a",
+  phone: "+1 (813) 248-4961",
+  address: "2117 E. 7th Ave., Tampa, FL 33605",
+  website: "https://www.columbiarestaurant.com/ybor-city-tampa",
   active: true,
   createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 30),
   updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 10),
@@ -89,15 +94,14 @@ const demoBusinessOne: BusinessRecord = {
 
 const demoBusinessTwo: BusinessRecord = {
   id: "biz-2",
-  name: "Luna Nail Studio",
-  slug: "luna-nail-studio",
-  description: "Premium nail art, skincare rituals, and signature self-care experiences.",
-  logoUrl: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=200&q=80",
-  primaryColor: "#ec4899",
-  secondaryColor: "#f9a8d4",
-  phone: "+1 (212) 555-0134",
-  address: "17 Orchard Lane, New York, NY",
-  website: "https://lunanails.example",
+  name: "Ulele",
+  slug: "ulele-tampa",
+  description: "Tampa restaurant serving native-inspired food and spirits made with ingredients from Florida waters and land.",
+  primaryColor: "#286c68",
+  secondaryColor: "#d39b4a",
+  phone: "+1 (813) 999-4952",
+  address: "1810 N. Highland Ave., Tampa, FL 33602",
+  website: "https://ulele.com/",
   active: true,
   createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 41),
   updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 8),
@@ -105,82 +109,317 @@ const demoBusinessTwo: BusinessRecord = {
 
 const demoBusinessThree: BusinessRecord = {
   id: "biz-3",
-  name: "Forge & Fade",
-  slug: "forge-and-fade",
-  description: "Classic cuts, beard work, and modern grooming in a relaxed barbershop setting.",
-  logoUrl: "https://images.unsplash.com/photo-1517832606299-7ae9b720a186?auto=format&fit=crop&w=200&q=80",
-  primaryColor: "#1f2937",
-  secondaryColor: "#f59e0b",
-  phone: "+1 (312) 555-0102",
-  address: "870 W Madison St, Chicago, IL",
-  website: "https://forgeandfade.example",
+  name: "The Ravenous Pig",
+  slug: "the-ravenous-pig-winter-park",
+  description: "A Winter Park restaurant featuring seasonal American cuisine and a menu that changes daily.",
+  primaryColor: "#41433c",
+  secondaryColor: "#c8663a",
+  phone: "+1 (407) 628-2333",
+  address: "565 W. Fairbanks Ave., Winter Park, FL 32789",
+  website: "https://www.theravenouspig.com/",
   active: true,
   createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 20),
   updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 7),
 };
 
-const store: DemoStore = {
-  businesses: [demoBusinessOne, demoBusinessTwo, demoBusinessThree],
-  tags: [
-    { id: "tag-1", businessId: "biz-1", code: "A7K92", name: "Main table", location: "Front counter", active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 25), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 12) },
-    { id: "tag-2", businessId: "biz-2", code: "N8L21", name: "Reception desk", location: "Checkout desk", active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 18), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 6) },
-    { id: "tag-3", businessId: "biz-3", code: "R2Q09", name: "Barber chair", location: "Waiting area", active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 15), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 5) },
-  ],
-  links: [
-    { id: "link-1", businessId: "biz-1", type: "MENU", label: "View Menu", url: "https://example.com/menu", icon: "utensils", position: 1, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 30), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 8) },
-    { id: "link-2", businessId: "biz-1", type: "REVIEWS", label: "Google Reviews", url: "https://example.com/reviews", icon: "star", position: 2, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 30), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 8) },
-    { id: "link-3", businessId: "biz-1", type: "RESERVATION", label: "Reserve a Table", url: "https://example.com/reserve", icon: "calendar", position: 3, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 30), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 8) },
-    { id: "link-4", businessId: "biz-2", type: "BOOKING", label: "Book Appointment", url: "https://example.com/book", icon: "calendar-check", position: 1, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 30), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 8) },
-    { id: "link-5", businessId: "biz-2", type: "INSTAGRAM", label: "Instagram", url: "https://instagram.com", icon: "instagram", position: 2, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 30), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 8) },
-    { id: "link-6", businessId: "biz-3", type: "WHATSAPP", label: "WhatsApp", url: "https://wa.me/15555550102", icon: "message-circle", position: 1, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 30), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 8) },
-    { id: "link-7", businessId: "biz-3", type: "CUSTOM", label: "Gift Card", url: "https://example.com/gift", icon: "gift", position: 2, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 30), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 8) },
-  ],
-  promotions: [
-    { id: "promo-1", businessId: "biz-1", title: "Sunset Supper Club", description: "Two-course dinner with a free dessert for late-night reservations.", imageUrl: "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=900&q=80", destinationUrl: "https://example.com/specials", active: true, startsAt: iso(now.getTime() - 1000 * 60 * 60 * 8), endsAt: iso(now.getTime() + 1000 * 60 * 60 * 24 * 20) },
-    { id: "promo-2", businessId: "biz-2", title: "Signature Soft Gel Set", description: "Book any premium manicure and save 15% this week.", imageUrl: "https://images.unsplash.com/photo-1521590832167-7ae9b3c0220a?auto=format&fit=crop&w=900&q=80", destinationUrl: "https://example.com/sale", active: true, startsAt: iso(now.getTime() - 1000 * 60 * 60 * 2), endsAt: iso(now.getTime() + 1000 * 60 * 60 * 24 * 9) },
-  ],
-  interactions: [
-    { id: "int-1", businessId: "biz-1", smartTagId: "tag-1", eventType: "PAGE_VIEW", source: "QR", createdAt: iso(now.getTime() - 1000 * 60 * 60 * 26) },
-    { id: "int-2", businessId: "biz-1", smartTagId: "tag-1", businessLinkId: "link-1", eventType: "LINK_CLICK", source: "NFC", createdAt: iso(now.getTime() - 1000 * 60 * 60 * 20) },
-    { id: "int-3", businessId: "biz-2", smartTagId: "tag-2", eventType: "PAGE_VIEW", source: "QR", createdAt: iso(now.getTime() - 1000 * 60 * 60 * 44) },
-    { id: "int-4", businessId: "biz-2", smartTagId: "tag-2", businessLinkId: "link-4", eventType: "LINK_CLICK", source: "NFC", createdAt: iso(now.getTime() - 1000 * 60 * 60 * 16) },
-    { id: "int-5", businessId: "biz-3", smartTagId: "tag-3", eventType: "PAGE_VIEW", source: "QR", createdAt: iso(now.getTime() - 1000 * 60 * 60 * 13) },
-  ],
+const demoBusinessFour: BusinessRecord = {
+  id: "biz-4",
+  name: "Tampa Nails",
+  slug: "tampa-nails-westshore",
+  description: "Nail salon in Tampa's Westshore area offering manicures, pedicures, and other beauty services.",
+  primaryColor: "#b85375",
+  secondaryColor: "#e5ae87",
+  phone: "+1 (813) 513-8600",
+  address: "4734 W Cypress St, Tampa, FL 33607",
+  website: "https://tampanails.com/",
+  active: true,
+  createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 12),
+  updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 4),
 };
 
-export function getDemoStore() {
-  return store;
+const demoBusinessFive: BusinessRecord = {
+  id: "biz-5",
+  name: "Tampa Spa & Nails",
+  slug: "tampa-spa-and-nails",
+  description: "Tampa nail salon offering manicures, pedicures, nail art, and waxing services.",
+  primaryColor: "#c16a79",
+  secondaryColor: "#e4b983",
+  phone: "+1 (813) 497-8900",
+  address: "3018 W Kennedy Blvd, Tampa, FL 33609",
+  website: "https://tampaspanails.com/",
+  active: true,
+  createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 9),
+  updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 3),
+};
+
+const demoBusinessSix: BusinessRecord = {
+  id: "biz-6",
+  name: "Barber & Co. - Gasworx",
+  slug: "barber-and-co-gasworx",
+  description: "Tampa barbershop at Gold's Gym Gasworx offering haircuts, beard trims, shaves, and grooming packages.",
+  primaryColor: "#343d42",
+  secondaryColor: "#c59a55",
+  phone: "+1 (813) 625-4762",
+  address: "802 N 12th Street, Tampa, FL 33602",
+  website: "https://www.barbercotampa.com/",
+  active: true,
+  createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 6),
+  updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 2),
+};
+
+const store: DemoStore = {
+  businesses: [demoBusinessOne, demoBusinessTwo, demoBusinessThree, demoBusinessFour, demoBusinessFive, demoBusinessSix],
+  tags: [
+    { id: "tag-1", businessId: "biz-1", code: "A7K92", name: "Columbia Ybor City", location: "Tampa, Florida", active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 25), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 12) },
+    { id: "tag-2", businessId: "biz-2", code: "N8L21", name: "Ulele Tampa", location: "Tampa, Florida", active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 18), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 6) },
+    { id: "tag-3", businessId: "biz-3", code: "R2Q09", name: "The Ravenous Pig", location: "Winter Park, Florida", active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 15), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 5) },
+    { id: "tag-4", businessId: "biz-4", code: "TN6A82", name: "Tampa Nails - Westshore", location: "Tampa, Florida", active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 12), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 4) },
+    { id: "tag-5", businessId: "biz-5", code: "TS4P91", name: "Tampa Spa & Nails", location: "Tampa, Florida", active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 9), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 3) },
+    { id: "tag-6", businessId: "biz-6", code: "BC7G53", name: "Barber & Co. Gasworx", location: "Tampa, Florida", active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 6), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 2) },
+  ],
+  links: [
+    { id: "link-1", businessId: "biz-1", type: "MENU", label: "Official Dinner Menu", url: "https://www.columbiarestaurant.com/_files/ugd/28e529_55b4395ee05445c0acdf7f673686322e.pdf", icon: "utensils", position: 1, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 30), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 8) },
+    { id: "link-2", businessId: "biz-1", type: "PHONE", label: "Call Columbia Ybor City", url: "tel:+18132484961", icon: "phone", position: 2, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 30), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 8) },
+    { id: "link-3", businessId: "biz-1", type: "RESERVATION", label: "Make a Reservation", url: "https://www.opentable.com/columbia-restaurant-ybor-city-reservations-tampa", icon: "calendar", position: 3, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 30), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 8) },
+    { id: "link-4", businessId: "biz-2", type: "MENU", label: "Official Menus", url: "https://ulele.com/menus/", icon: "utensils", position: 1, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 30), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 8) },
+    { id: "link-5", businessId: "biz-2", type: "PHONE", label: "Call Ulele", url: "tel:+18139994952", icon: "phone", position: 2, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 30), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 8) },
+    { id: "link-6", businessId: "biz-2", type: "RESERVATION", label: "Make a Reservation", url: "https://www.opentable.com/ulele-reservations-tampa", icon: "calendar", position: 3, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 30), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 8) },
+    { id: "link-7", businessId: "biz-3", type: "MENU", label: "Official Menu", url: "https://www.theravenouspig.com/menu", icon: "utensils", position: 1, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 30), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 8) },
+    { id: "link-8", businessId: "biz-3", type: "PHONE", label: "Call The Ravenous Pig", url: "tel:+14076282333", icon: "phone", position: 2, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 30), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 8) },
+    { id: "link-9", businessId: "biz-3", type: "WEBSITE", label: "Contact The Ravenous Pig", url: "https://www.theravenouspig.com/contact", icon: "globe", position: 3, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 30), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 8) },
+    { id: "link-10", businessId: "biz-4", type: "MENU", label: "Services Menu", url: "https://tampanails.com/services/", icon: "sparkles", position: 1, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 12), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 4) },
+    { id: "link-11", businessId: "biz-4", type: "BOOKING", label: "Book an Appointment", url: "https://booking.gocheckin.net/v2/13064", icon: "calendar", position: 2, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 12), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 4) },
+    { id: "link-12", businessId: "biz-4", type: "PHONE", label: "Call Tampa Nails", url: "tel:+18135138600", icon: "phone", position: 3, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 12), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 4) },
+    { id: "link-13", businessId: "biz-5", type: "MENU", label: "Services Menu", url: "https://tampaspanails.com/services", icon: "sparkles", position: 1, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 9), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 3) },
+    { id: "link-14", businessId: "biz-5", type: "BOOKING", label: "Book an Appointment", url: "https://lk.macmarketing.us/Tampa33609-Booking", icon: "calendar", position: 2, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 9), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 3) },
+    { id: "link-15", businessId: "biz-5", type: "PHONE", label: "Call Tampa Spa & Nails", url: "tel:+18134978900", icon: "phone", position: 3, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 9), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 3) },
+    { id: "link-16", businessId: "biz-6", type: "CUSTOM", label: "Services and Pricing", url: "https://www.barbercotampa.com/", icon: "scissors", position: 1, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 6), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 2) },
+    { id: "link-17", businessId: "biz-6", type: "BOOKING", label: "Book an Appointment", url: "https://www.barbercotampa.com/team", icon: "calendar", position: 2, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 6), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 2) },
+    { id: "link-18", businessId: "biz-6", type: "PHONE", label: "Call Barber & Co.", url: "tel:+18136254762", icon: "phone", position: 3, active: true, createdAt: iso(now.getTime() - 1000 * 60 * 60 * 24 * 6), updatedAt: iso(now.getTime() - 1000 * 60 * 60 * 2) },
+  ],
+  tagLinkAssignments: [],
+  promotions: [],
+  interactions: [],
+};
+
+store.tagLinkAssignments = store.tags.flatMap((tag) =>
+  store.links
+    .filter((link) => link.businessId === tag.businessId && link.active)
+    .map((link) => ({ smartTagId: tag.id, businessLinkId: link.id })),
+);
+
+function toBusinessRecord(record: Business): BusinessRecord {
+  return {
+    id: record.id,
+    name: record.name,
+    slug: record.slug,
+    description: record.description ?? "",
+    logoUrl: record.logoUrl ?? undefined,
+    primaryColor: record.primaryColor ?? "#0f172a",
+    secondaryColor: record.secondaryColor ?? "#f97316",
+    phone: record.phone ?? "",
+    address: record.address ?? "",
+    website: record.website ?? "",
+    active: record.active,
+    createdAt: record.createdAt.toISOString(),
+    updatedAt: record.updatedAt.toISOString(),
+  };
 }
 
-export function getBusinessById(id: string) {
-  return store.businesses.find((business) => business.id === id);
+function toSmartTagRecord(record: SmartTag): SmartTagRecord {
+  return {
+    id: record.id,
+    businessId: record.businessId,
+    code: record.code,
+    name: record.name ?? "",
+    location: record.location ?? "",
+    active: record.active,
+    createdAt: record.createdAt.toISOString(),
+    updatedAt: record.updatedAt.toISOString(),
+  };
 }
 
-export function getBusinessBySlug(slug: string) {
-  return store.businesses.find((business) => business.slug === slug);
+function toBusinessLinkRecord(record: BusinessLink): BusinessLinkRecord {
+  return {
+    id: record.id,
+    businessId: record.businessId,
+    type: record.type,
+    label: record.label,
+    url: record.url,
+    icon: record.icon ?? "link",
+    position: record.position,
+    active: record.active,
+    createdAt: record.createdAt.toISOString(),
+    updatedAt: record.updatedAt.toISOString(),
+  };
 }
 
-export function getTagByCode(code: string) {
-  return store.tags.find((tag) => tag.code === code.toUpperCase());
+function toPromotionRecord(record: Promotion): PromotionRecord {
+  return {
+    id: record.id,
+    businessId: record.businessId,
+    title: record.title,
+    description: record.description ?? "",
+    imageUrl: record.imageUrl ?? undefined,
+    destinationUrl: record.destinationUrl ?? undefined,
+    active: record.active,
+    startsAt: record.startsAt?.toISOString(),
+    endsAt: record.endsAt?.toISOString(),
+  };
 }
 
-export function getBusinessLinks(businessId: string) {
+function toInteractionRecord(record: Interaction): InteractionRecord {
+  return {
+    id: record.id,
+    businessId: record.businessId,
+    smartTagId: record.smartTagId ?? undefined,
+    businessLinkId: record.businessLinkId ?? undefined,
+    eventType: record.eventType as InteractionRecord["eventType"],
+    source: record.source as InteractionRecord["source"],
+    createdAt: record.createdAt.toISOString(),
+  };
+}
+
+async function getDbStore(): Promise<DemoStore> {
+  const [businesses, tags, links, tagLinkAssignments, promotions] = await Promise.all([
+    prisma.business.findMany({ orderBy: { createdAt: "asc" } }),
+    prisma.smartTag.findMany({ orderBy: { createdAt: "asc" } }),
+    prisma.businessLink.findMany({ orderBy: [{ businessId: "asc" }, { position: "asc" }] }),
+    prisma.smartTagLink.findMany({ select: { smartTagId: true, businessLinkId: true } }),
+    prisma.promotion.findMany({ orderBy: { createdAt: "asc" } }),
+  ]);
+
+  return {
+    businesses: businesses.map(toBusinessRecord),
+    tags: tags.map(toSmartTagRecord),
+    links: links.map(toBusinessLinkRecord),
+    tagLinkAssignments,
+    promotions: promotions.map(toPromotionRecord),
+    interactions: [],
+  };
+}
+
+export async function getDemoStore() {
+  return isDemoModeEnabled() ? store : await getDbStore();
+}
+
+export async function getBusinessById(id: string) {
+  if (!isDemoModeEnabled()) {
+    const business = await prisma.business.findUnique({ where: { id } });
+    return business ? toBusinessRecord(business) : null;
+  }
+
+  return store.businesses.find((business) => business.id === id) ?? null;
+}
+
+export async function getBusinessBySlug(slug: string) {
+  if (!isDemoModeEnabled()) {
+    const business = await prisma.business.findUnique({ where: { slug } });
+    return business ? toBusinessRecord(business) : null;
+  }
+
+  return store.businesses.find((business) => business.slug === slug) ?? null;
+}
+
+export async function getTagByCode(code: string) {
+  if (!isDemoModeEnabled()) {
+    const tag = await prisma.smartTag.findUnique({ where: { code: code.toUpperCase() } });
+    return tag ? toSmartTagRecord(tag) : null;
+  }
+
+  return store.tags.find((tag) => tag.code === code.toUpperCase()) ?? null;
+}
+
+export async function getBusinessLinks(businessId: string) {
+  if (!isDemoModeEnabled()) {
+    const links = await prisma.businessLink.findMany({
+      where: { businessId, active: true },
+      orderBy: { position: "asc" },
+    });
+
+    return links.map(toBusinessLinkRecord);
+  }
+
   return store.links
     .filter((link) => link.businessId === businessId && link.active)
     .sort((a, b) => a.position - b.position);
 }
 
-export function getBusinessPromotions(businessId: string) {
+export async function getTagBusinessLinks(tagId: string, businessId: string) {
+  if (!isDemoModeEnabled()) {
+    const links = await prisma.businessLink.findMany({
+      where: {
+        businessId,
+        active: true,
+        tagAssignments: { some: { smartTagId: tagId } },
+      },
+      orderBy: { position: "asc" },
+    });
+
+    return links.map(toBusinessLinkRecord);
+  }
+
+  const assignedLinkIds = new Set(
+    store.tagLinkAssignments
+      .filter((assignment) => assignment.smartTagId === tagId)
+      .map((assignment) => assignment.businessLinkId),
+  );
+  return store.links
+    .filter((link) => link.businessId === businessId && link.active && assignedLinkIds.has(link.id))
+    .sort((a, b) => a.position - b.position);
+}
+
+export async function setSmartTagLinkAssignments(tagId: string, linkIds: string[]) {
+  if (!isDemoModeEnabled()) {
+    await prisma.$transaction(async (transaction) => {
+      await transaction.smartTagLink.deleteMany({ where: { smartTagId: tagId } });
+      if (linkIds.length) {
+        await transaction.smartTagLink.createMany({
+          data: linkIds.map((businessLinkId) => ({ smartTagId: tagId, businessLinkId })),
+        });
+      }
+    });
+    return;
+  }
+
+  store.tagLinkAssignments = store.tagLinkAssignments.filter((assignment) => assignment.smartTagId !== tagId);
+  store.tagLinkAssignments.push(...linkIds.map((businessLinkId) => ({ smartTagId: tagId, businessLinkId })));
+}
+
+export async function getBusinessPromotions(businessId: string) {
+  if (!isDemoModeEnabled()) {
+    const promotions = await prisma.promotion.findMany({
+      where: { businessId, active: true },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return promotions.map(toPromotionRecord);
+  }
+
   return store.promotions.filter((promo) => promo.businessId === businessId && promo.active);
 }
 
-export function recordInteraction(args: {
+export async function recordInteraction(args: {
   businessId: string;
   smartTagId?: string;
   businessLinkId?: string;
   eventType: "PAGE_VIEW" | "LINK_CLICK" | "PROMOTION_CLICK";
   source?: "NFC" | "QR" | "UNKNOWN";
 }) {
+  if (!isDemoModeEnabled()) {
+    const interaction = await prisma.interaction.create({
+      data: {
+        businessId: args.businessId,
+        smartTagId: args.smartTagId ?? null,
+        businessLinkId: args.businessLinkId ?? null,
+        eventType: args.eventType as PrismaEventType,
+        source: (args.source ?? "UNKNOWN") as PrismaSourceType,
+      },
+    });
+
+    return toInteractionRecord(interaction);
+  }
+
   const interaction: InteractionRecord = {
     id: `int-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     businessId: args.businessId,
@@ -195,7 +434,26 @@ export function recordInteraction(args: {
   return interaction;
 }
 
-export function createBusiness(input: Partial<BusinessRecord>) {
+export async function createBusiness(input: Partial<BusinessRecord>) {
+  if (!isDemoModeEnabled()) {
+    const business = await prisma.business.create({
+      data: {
+        name: input.name ?? "New Business",
+        slug: input.slug ?? `business-${Date.now()}`,
+        description: input.description ?? "",
+        logoUrl: input.logoUrl ?? null,
+        primaryColor: input.primaryColor ?? "#0f172a",
+        secondaryColor: input.secondaryColor ?? "#f97316",
+        phone: input.phone ?? "",
+        address: input.address ?? "",
+        website: input.website ?? "",
+        active: input.active ?? true,
+      },
+    });
+
+    return toBusinessRecord(business);
+  }
+
   const business: BusinessRecord = {
     id: `biz-${Date.now()}`,
     name: input.name ?? "New Business",
@@ -216,7 +474,27 @@ export function createBusiness(input: Partial<BusinessRecord>) {
   return business;
 }
 
-export function updateBusiness(id: string, input: Partial<BusinessRecord>) {
+export async function updateBusiness(id: string, input: Partial<BusinessRecord>) {
+  if (!isDemoModeEnabled()) {
+    const business = await prisma.business.update({
+      where: { id },
+      data: {
+        name: input.name,
+        slug: input.slug,
+        description: input.description,
+        logoUrl: input.logoUrl ?? undefined,
+        primaryColor: input.primaryColor,
+        secondaryColor: input.secondaryColor,
+        phone: input.phone,
+        address: input.address,
+        website: input.website,
+        active: input.active,
+      },
+    });
+
+    return toBusinessRecord(business);
+  }
+
   const idx = store.businesses.findIndex((business) => business.id === id);
   if (idx === -1) return null;
 
@@ -230,7 +508,55 @@ export function updateBusiness(id: string, input: Partial<BusinessRecord>) {
   return store.businesses[idx];
 }
 
-export function createTag(input: Partial<SmartTagRecord>) {
+export async function deleteBusiness(id: string) {
+  if (!isDemoModeEnabled()) {
+    await prisma.business.delete({ where: { id } });
+    return true;
+  }
+
+  const business = store.businesses.find((item) => item.id === id);
+  if (!business) return false;
+
+  const tagIds = new Set(store.tags.filter((tag) => tag.businessId === id).map((tag) => tag.id));
+  const linkIds = new Set(store.links.filter((link) => link.businessId === id).map((link) => link.id));
+  store.businesses = store.businesses.filter((item) => item.id !== id);
+  store.tags = store.tags.filter((tag) => tag.businessId !== id);
+  store.links = store.links.filter((link) => link.businessId !== id);
+  store.promotions = store.promotions.filter((promotion) => promotion.businessId !== id);
+  store.interactions = store.interactions.filter((interaction) => interaction.businessId !== id);
+  store.tagLinkAssignments = store.tagLinkAssignments.filter((assignment) =>
+    !tagIds.has(assignment.smartTagId) && !linkIds.has(assignment.businessLinkId),
+  );
+  return true;
+}
+
+export async function createTag(input: Partial<SmartTagRecord>) {
+  if (!isDemoModeEnabled()) {
+    const tag = await prisma.$transaction(async (transaction) => {
+      const createdTag = await transaction.smartTag.create({
+        data: {
+          businessId: input.businessId ?? "",
+          code: input.code ?? `TAG-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+          name: input.name ?? "Smart Tag",
+          location: input.location ?? "",
+          active: input.active ?? true,
+        },
+      });
+      const links = await transaction.businessLink.findMany({
+        where: { businessId: createdTag.businessId, active: true },
+        select: { id: true },
+      });
+      if (links.length) {
+        await transaction.smartTagLink.createMany({
+          data: links.map((link) => ({ smartTagId: createdTag.id, businessLinkId: link.id })),
+        });
+      }
+      return createdTag;
+    });
+
+    return toSmartTagRecord(tag);
+  }
+
   const generatedCode = input.code ?? `TAG-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
   const tag: SmartTagRecord = {
     id: `tag-${Date.now()}`,
@@ -244,10 +570,30 @@ export function createTag(input: Partial<SmartTagRecord>) {
   };
 
   store.tags.push(tag);
+  store.tagLinkAssignments.push(
+    ...store.links
+      .filter((link) => link.businessId === tag.businessId && link.active)
+      .map((link) => ({ smartTagId: tag.id, businessLinkId: link.id })),
+  );
   return tag;
 }
 
-export function updateTag(id: string, input: Partial<SmartTagRecord>) {
+export async function updateTag(id: string, input: Partial<SmartTagRecord>) {
+  if (!isDemoModeEnabled()) {
+    const tag = await prisma.smartTag.update({
+      where: { id },
+      data: {
+        businessId: input.businessId,
+        code: input.code,
+        name: input.name,
+        location: input.location,
+        active: input.active,
+      },
+    });
+
+    return toSmartTagRecord(tag);
+  }
+
   const idx = store.tags.findIndex((tag) => tag.id === id);
   if (idx === -1) return null;
 
@@ -261,7 +607,39 @@ export function updateTag(id: string, input: Partial<SmartTagRecord>) {
   return store.tags[idx];
 }
 
-export function createLink(input: Partial<BusinessLinkRecord>) {
+export async function deleteTag(id: string) {
+  if (!isDemoModeEnabled()) {
+    await prisma.smartTag.delete({ where: { id } });
+    return true;
+  }
+
+  const idx = store.tags.findIndex((tag) => tag.id === id);
+  if (idx === -1) return false;
+  store.tags.splice(idx, 1);
+  store.tagLinkAssignments = store.tagLinkAssignments.filter((assignment) => assignment.smartTagId !== id);
+  store.interactions = store.interactions.map((interaction) =>
+    interaction.smartTagId === id ? { ...interaction, smartTagId: undefined } : interaction,
+  );
+  return true;
+}
+
+export async function createLink(input: Partial<BusinessLinkRecord>) {
+  if (!isDemoModeEnabled()) {
+    const link = await prisma.businessLink.create({
+      data: {
+        businessId: input.businessId ?? "",
+        type: (input.type ?? "CUSTOM") as PrismaLinkType,
+        label: input.label ?? "New Link",
+        url: input.url ?? "https://example.com",
+        icon: input.icon ?? "link",
+        position: input.position ?? 0,
+        active: input.active ?? true,
+      },
+    });
+
+    return toBusinessLinkRecord(link);
+  }
+
   const link: BusinessLinkRecord = {
     id: `link-${Date.now()}`,
     businessId: input.businessId ?? "biz-1",
@@ -279,7 +657,24 @@ export function createLink(input: Partial<BusinessLinkRecord>) {
   return link;
 }
 
-export function updateLink(id: string, input: Partial<BusinessLinkRecord>) {
+export async function updateLink(id: string, input: Partial<BusinessLinkRecord>) {
+  if (!isDemoModeEnabled()) {
+    const link = await prisma.businessLink.update({
+      where: { id },
+      data: {
+        businessId: input.businessId,
+        type: input.type ? (input.type as PrismaLinkType) : undefined,
+        label: input.label,
+        url: input.url,
+        icon: input.icon,
+        position: input.position,
+        active: input.active,
+      },
+    });
+
+    return toBusinessLinkRecord(link);
+  }
+
   const idx = store.links.findIndex((link) => link.id === id);
   if (idx === -1) return null;
 
@@ -293,18 +688,33 @@ export function updateLink(id: string, input: Partial<BusinessLinkRecord>) {
   return store.links[idx];
 }
 
-export function deleteLink(id: string) {
+export async function deleteLink(id: string) {
+  if (!isDemoModeEnabled()) {
+    await prisma.businessLink.delete({ where: { id } });
+    return true;
+  }
+
   const idx = store.links.findIndex((link) => link.id === id);
   if (idx === -1) return false;
   store.links.splice(idx, 1);
+  store.tagLinkAssignments = store.tagLinkAssignments.filter((assignment) => assignment.businessLinkId !== id);
   return true;
 }
 
-export function resolveSmartTag(code: string) {
+export async function resolveSmartTag(code: string) {
   const normalized = code.toUpperCase();
+
+  if (!isDemoModeEnabled()) {
+    const tag = await getTagByCode(normalized);
+    if (!tag || !tag.active) return null;
+
+    const business = await getBusinessById(tag.businessId);
+    return { tag, business };
+  }
+
   const tag = store.tags.find((item) => item.code === normalized && item.active);
   if (!tag) return null;
 
-  const business = getBusinessById(tag.businessId);
+  const business = await getBusinessById(tag.businessId);
   return { tag, business };
 }

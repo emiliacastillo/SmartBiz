@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { deleteLink, updateLink } from "@/lib/demo-store";
 import { getSessionUser } from "@/lib/session";
+import { linkSchema } from "@/lib/validators";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSessionUser();
@@ -11,7 +12,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   const { id } = await params;
   const payload = await request.json();
-  const link = updateLink(id, payload);
+  const parsed = linkSchema.safeParse(payload);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  }
+
+  const link = await updateLink(id, parsed.data);
   if (!link) {
     return NextResponse.json({ error: "Link not found" }, { status: 404 });
   }

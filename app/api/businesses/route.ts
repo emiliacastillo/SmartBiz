@@ -10,7 +10,8 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  return NextResponse.json(getDemoStore().businesses);
+  const store = await getDemoStore();
+  return NextResponse.json(store.businesses);
 }
 
 export async function POST(request: Request) {
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const business = createBusiness({
+  const business = await createBusiness({
     ...parsed.data,
     slug: parsed.data.slug ?? parsed.data.name.toLowerCase().replace(/\s+/g, "-")
   });

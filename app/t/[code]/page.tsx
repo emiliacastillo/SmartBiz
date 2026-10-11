@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { SmartPageLayout } from "@/components/smart-page";
-import { getBusinessById, getBusinessLinks, getBusinessPromotions, getTagByCode, recordInteraction } from "@/lib/demo-store";
+import { getBusinessById, getBusinessPromotions, getTagByCode, getTagBusinessLinks, recordInteraction } from "@/lib/demo-store";
 
 export default async function SmartTagPage({
   params,
@@ -12,26 +12,26 @@ export default async function SmartTagPage({
 }) {
   const { code } = await params;
   const query = searchParams ? await searchParams : {};
-  const tag = getTagByCode(code);
+  const tag = await getTagByCode(code);
 
   if (!tag || !tag.active) {
     notFound();
   }
 
-  const business = getBusinessById(tag.businessId);
+  const business = await getBusinessById(tag.businessId);
   if (!business || !business.active) {
     notFound();
   }
 
-  recordInteraction({
+  await recordInteraction({
     businessId: business.id,
     smartTagId: tag.id,
     eventType: "PAGE_VIEW",
     source: query.src === "nfc" ? "NFC" : query.src === "qr" ? "QR" : "UNKNOWN",
   });
 
-  const links = getBusinessLinks(business.id);
-  const promotions = getBusinessPromotions(business.id);
+  const links = await getTagBusinessLinks(tag.id, business.id);
+  const promotions = await getBusinessPromotions(business.id);
 
   const source = query.src === "nfc" ? "nfc" : query.src === "qr" ? "qr" : "unknown";
 

@@ -14,3 +14,7 @@ export const appEnv = envSchema.parse({
   ...process.env,
   NEXT_PUBLIC_DEMO_MODE: process.env.NEXT_PUBLIC_DEMO_MODE ?? "true",
 });
+
+export function isDemoModeEnabled() {
+  return ["true", "1", "yes", "on"].includes((process.env.NEXT_PUBLIC_DEMO_MODE ?? appEnv.NEXT_PUBLIC_DEMO_MODE ?? "true").toLowerCase());
+}

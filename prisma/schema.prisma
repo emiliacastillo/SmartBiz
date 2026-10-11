@@ -96,6 +96,7 @@ model SmartTag {
   updatedAt DateTime @updatedAt
 
   business    Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  linkAssignments SmartTagLink[]
   interactions Interaction[]
 
   @@index([businessId])
@@ -115,9 +116,22 @@ model BusinessLink {
   updatedAt DateTime @updatedAt
 
   business    Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  tagAssignments SmartTagLink[]
   interactions Interaction[]
 
   @@index([businessId, position])
+}
+
+model SmartTagLink {
+  smartTagId     String
+  businessLinkId String
+  createdAt      DateTime @default(now())
+
+  smartTag     SmartTag     @relation(fields: [smartTagId], references: [id], onDelete: Cascade)
+  businessLink BusinessLink @relation(fields: [businessLinkId], references: [id], onDelete: Cascade)
+
+  @@id([smartTagId, businessLinkId])
+  @@index([businessLinkId])
 }
 
 model Promotion {

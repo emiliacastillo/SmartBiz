@@ -14,13 +14,14 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Missing promoId" }, { status: 400 });
   }
 
-  const promotion = getDemoStore().promotions.find((item) => item.id === promoId && item.active);
+  const store = await getDemoStore();
+  const promotion = store.promotions.find((item) => item.id === promoId && item.active);
   if (!promotion || !promotion.destinationUrl) {
     return NextResponse.json({ error: "Promotion not found" }, { status: 404 });
   }
 
-  const tag = tagCode ? getDemoStore().tags.find((item) => item.code === tagCode.toUpperCase()) : undefined;
-  recordInteraction({
+  const tag = tagCode ? store.tags.find((item) => item.code === tagCode.toUpperCase()) : undefined;
+  await recordInteraction({
     businessId: promotion.businessId,
     smartTagId: tag?.id,
     eventType: "PROMOTION_CLICK",

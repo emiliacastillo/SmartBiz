@@ -1,6 +1,6 @@
 # Smart Business Platform MVP
 
-A local-first SaaS MVP for NFC and QR smart business pages. The app includes a public smart-page resolver, platform admin flow, business dashboard, secure session handling, Prisma-ready data model, demo businesses, and QR generation support.
+A local-first SaaS MVP for NFC and QR smart business pages. The app includes a public smart-page resolver, platform admin flow, business dashboard, secure session handling, Prisma data model, Florida sample businesses, and QR generation support.
 
 ## Architecture summary
 
@@ -32,6 +32,7 @@ This starts PostgreSQL with the settings in `.env`:
 ```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/smartbiz?schema=public"
 DIRECT_URL="postgresql://postgres:postgres@localhost:5432/smartbiz?schema=public"
+NEXT_PUBLIC_DEMO_MODE="false"
 ```
 
 To confirm the container is running:
@@ -65,7 +66,28 @@ npx prisma generate
 npx prisma migrate dev --name init
 ```
 
-### 4) Start the app
+### 4) Seed the database with real demo data
+
+```bash
+npm run db:seed
+```
+
+This loads a real set of sample businesses, links, tags, promotions, and interactions into PostgreSQL. The seed script is defined in `prisma/seed.js` and is configured in `prisma.config.ts`.
+
+### 5) Demo mode configuration
+
+The app can be controlled via environment variables:
+
+```env
+NEXT_PUBLIC_DEMO_MODE="false"
+```
+
+- `true`: uses the in-memory demo store
+- `false`: uses the real PostgreSQL-backed app data
+
+Set `NEXT_PUBLIC_APP_URL` to the public origin used by the deployment so generated smart-tag URLs point to the deployed app. Locally, keep it as `http://localhost:3000`.
+
+### 6) Start the app
 
 Recommended:
 
@@ -83,13 +105,13 @@ The app should be available at:
 
 - `http://localhost:3000`
 
-### 5) Stop the database
+### 7) Stop the database
 
 ```bash
 docker compose down
 ```
 
-### 6) Troubleshooting
+### 8) Troubleshooting
 
 - If Docker says the daemon is unavailable, open Docker Desktop and wait for it to finish starting.
 - If Prisma fails to connect, confirm PostgreSQL is running with `docker compose ps`.
@@ -110,11 +132,16 @@ v22.x
 - Email: `admin@smartbiz.local`
 - Password: `admin123`
 
-## Demo smart tags
+## Florida sample businesses and smart tags
 
-- Sunset Bistro: `A7K92`
-- Luna Nail Studio: `N8L21`
-- Forge & Fade: `R2Q09`
+- Columbia Restaurant - Ybor City, Tampa: `A7K92` ([official menu](https://www.columbiarestaurant.com/_files/ugd/28e529_55b4395ee05445c0acdf7f673686322e.pdf), [contact and location](https://www.columbiarestaurant.com/ybor-city-tampa))
+- Ulele, Tampa: `N8L21` ([official menus](https://ulele.com/menus/), [contact and location](https://ulele.com/))
+- The Ravenous Pig, Winter Park: `R2Q09` ([official menu](https://www.theravenouspig.com/menu), [contact page](https://www.theravenouspig.com/contact))
+- Tampa Nails, Westshore: `TN6A82` ([services](https://tampanails.com/services/), [contact and location](https://tampanails.com/contact/))
+- Tampa Spa & Nails: `TS4P91` ([services and booking](https://tampaspanails.com/), [contact and location](https://tampaspanails.com/contact-us))
+- Barber & Co. - Gasworx, Tampa: `BC7G53` ([services, booking, and contact](https://www.barbercotampa.com/))
+
+The seed uses publicly listed business information and links to each business's public menu or contact pages. The businesses are independent examples and are not affiliated with this project.
 
 ## Swagger / API docs
 
@@ -134,6 +161,8 @@ This document covers the public smart-page flow, admin management endpoints, QR 
 - `npm test`
 - `npx prisma generate`
 - `npx prisma migrate dev --name init`
+- `npm run db:seed`
+- `npx prisma studio`
 
 ## Notes
 

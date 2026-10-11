@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 import type { BusinessRecord, BusinessLinkRecord, PromotionRecord } from "@/lib/demo-store";
-import { ArrowUpRight, MapPin, Phone, Star, Globe, Sparkles, CalendarClock, Link2, Utensils, MessageCircle, Gift, CalendarCheck2 } from "lucide-react";
+import { ArrowUpRight, MapPin, Phone, Star, Globe, Sparkles, CalendarClock, Link2, Utensils, MessageCircle, Gift, CalendarCheck2, Scissors } from "lucide-react";
 
 const iconMap: Record<string, typeof Link2> = {
   utensils: Utensils,
@@ -11,6 +11,10 @@ const iconMap: Record<string, typeof Link2> = {
   message: MessageCircle,
   "calendar-check": CalendarCheck2,
   "message-circle": MessageCircle,
+  phone: Phone,
+  globe: Globe,
+  sparkles: Sparkles,
+  scissors: Scissors,
   gift: Gift,
   link: Link2,
 };
@@ -58,7 +62,9 @@ export function SmartLinkButton({
   tagCode?: string;
   source?: "nfc" | "qr" | "unknown";
 }) {
-  const href = `/api/track/link?linkId=${link.id}&tagCode=${encodeURIComponent(tagCode ?? "")}&source=${source ?? "unknown"}`;
+  const href = link.url.startsWith("tel:")
+    ? link.url
+    : `/api/track/link?linkId=${link.id}&tagCode=${encodeURIComponent(tagCode ?? "")}&source=${source ?? "unknown"}`;
 
   return (
     <a
