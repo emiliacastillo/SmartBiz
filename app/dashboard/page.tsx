@@ -37,7 +37,7 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-600">Business dashboard</p>
             <h1 className="text-3xl font-bold">{business.name}</h1>
           </div>
-          <form action="/api/logout" method="GET">
+          <form action="/api/logout" method="POST">
             <Button type="submit" variant="outline">Sign out</Button>
           </form>
         </div>

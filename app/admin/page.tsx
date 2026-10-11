@@ -30,7 +30,7 @@ export default async function AdminPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-orange-600">Platform admin</p>
             <h1 className="text-3xl font-bold">Business overview</h1>
           </div>
-          <Link href="/api/logout"><Button variant="outline">Sign out</Button></Link>
+          <form action="/api/logout" method="POST"><Button type="submit" variant="outline">Sign out</Button></form>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">

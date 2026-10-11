@@ -22,6 +22,13 @@ const openApiSpec = {
   ],
   paths: {
     "/api/login": {
+      get: {
+        tags: ["Auth"],
+        summary: "Open the login screen without authenticating",
+        responses: {
+          "303": { description: "Redirect to the login screen" },
+        },
+      },
       post: {
         tags: ["Auth"],
         summary: "Admin login",
@@ -41,8 +48,7 @@ const openApiSpec = {
           },
         },
         responses: {
-          "302": { description: "Redirect to the admin panel" },
-          "303": { description: "Redirect with invalid credentials" },
+          "303": { description: "Redirect to the admin panel or back to login for invalid credentials" },
         },
       },
     },
