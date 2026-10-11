@@ -41,5 +41,9 @@ export function formatCurrency(value: number) {
 }
 
 export function getAppUrl() {
+  // Printed tags must use the stable public domain, not an old APP_URL or a preview deployment.
+  if (process.env.NODE_ENV === "production") {
+    return "https://smart-biz-rouge.vercel.app";
+  }
   return (process.env.APP_URL ?? "http://localhost:3000").replace(/\/+$/, "");
 }

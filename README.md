@@ -78,7 +78,7 @@ This loads a real set of sample businesses, links, tags, promotions, and interac
 
 The app always uses PostgreSQL through Prisma. Configure `DATABASE_URL` and apply migrations before starting the app. Sample data is optional and can be loaded with the seed command.
 
-Set `APP_URL` to the public origin used by the deployment so generated smart-tag URLs point to the deployed app. Locally, keep it as `http://localhost:3000`.
+Production smart-tag links and QR codes use the canonical origin `https://smart-biz-rouge.vercel.app`, defined in `getAppUrl()` in `lib/utils.ts`. This also keeps preview builds from generating printed codes for temporary deployment URLs. An outdated `APP_URL` does not override the production domain. For local development, `APP_URL` defaults to `http://localhost:3000`.
 
 ### 6) Start the app
 
