@@ -10,6 +10,7 @@ import {
 } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
+import { serviceImagesSchema, serviceActionsSchema, type ServiceImage, type ServiceAction } from "@/lib/service-content";
 
 export type BusinessRecord = {
   id: string;
@@ -44,6 +45,9 @@ export type BusinessLinkRecord = {
   type: string;
   label: string;
   url: string;
+  description: string;
+  images: ServiceImage[];
+  actions: ServiceAction[];
   icon: string;
   position: number;
   active: boolean;
@@ -68,7 +72,7 @@ export type InteractionRecord = {
   businessId: string;
   smartTagId?: string;
   businessLinkId?: string;
-  eventType: "PAGE_VIEW" | "LINK_CLICK" | "PROMOTION_CLICK";
+  eventType: "PAGE_VIEW" | "LINK_CLICK" | "PROMOTION_CLICK" | "SERVICE_VIEW" | "IMAGE_VIEW" | "IMAGE_EXPAND";
   source: "NFC" | "QR" | "UNKNOWN";
   createdAt: string;
 };
@@ -120,6 +124,9 @@ function toBusinessLinkRecord(record: BusinessLink): BusinessLinkRecord {
     type: record.type,
     label: record.label,
     url: record.url,
+    description: record.description ?? "",
+    images: serviceImagesSchema.parse(record.images ?? []),
+    actions: serviceActionsSchema.parse(record.actions ?? []),
     icon: record.icon ?? "link",
     position: record.position,
     active: record.active,
@@ -233,6 +240,8 @@ export async function recordInteraction(args: {
   businessLinkId?: string;
   eventType: InteractionRecord["eventType"];
   source?: InteractionRecord["source"];
+  informationType?: string;
+  targetId?: string;
 }): Promise<InteractionRecord> {
   const interaction = await prisma.interaction.create({
     data: {
@@ -241,6 +250,8 @@ export async function recordInteraction(args: {
       businessLinkId: args.businessLinkId ?? null,
       eventType: args.eventType as PrismaEventType,
       source: (args.source ?? "UNKNOWN") as PrismaSourceType,
+      ...(args.informationType ? { informationType: args.informationType } : {}),
+      ...(args.targetId ? { targetId: args.targetId } : {}),
     },
   });
   return toInteractionRecord(interaction);
@@ -336,7 +347,10 @@ export async function createLink(input: Partial<BusinessLinkRecord>): Promise<Bu
       businessId: input.businessId ?? "",
       type: (input.type ?? "CUSTOM") as PrismaLinkType,
       label: input.label ?? "New Link",
-      url: input.url ?? "https://example.com",
+      url: input.url ?? "",
+      description: input.description ?? "",
+      images: input.images ?? [],
+      actions: input.actions ?? [],
       icon: input.icon ?? "link",
       position: input.position ?? 0,
       active: input.active ?? true,
@@ -353,6 +367,9 @@ export async function updateLink(id: string, input: Partial<BusinessLinkRecord>)
       type: input.type ? (input.type as PrismaLinkType) : undefined,
       label: input.label,
       url: input.url,
+      description: input.description,
+      images: input.images,
+      actions: input.actions,
       icon: input.icon,
       position: input.position,
       active: input.active,

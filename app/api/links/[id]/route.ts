@@ -32,10 +32,7 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
   }
 
   const { id } = await params;
-  const deleted = deleteLink(id);
-  if (!deleted) {
-    return NextResponse.json({ error: "Link not found" }, { status: 404 });
-  }
+  await deleteLink(id);
 
   return NextResponse.json({ success: true });
 }

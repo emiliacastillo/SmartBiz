@@ -9,6 +9,7 @@ type SourceName = "NFC" | "QR" | "UNKNOWN";
 type DailyMetrics = { date: string; pageViews: number; linkClicks: number; promotionClicks: number };
 
 export type BusinessAnalytics = {
+  serviceAccess?: { serviceId: string; label: string; informationType: string; eventType: string; count: number }[];
   totalPageViews: number;
   totalLinkClicks: number;
   totalPromotions: number;
@@ -92,7 +93,22 @@ export async function aggregateBusinessAnalytics(businessId: string, requestedDa
     ? await prisma.businessLink.findMany({ where: { id: { in: topLinkIds.map(([id]) => id) } }, select: { id: true, label: true, url: true } })
     : [];
 
-  return buildAnalyticsResult(counts, sourceCounts, dailySeries, linkCounts, links);
+  const serviceGroups = await prisma.interaction.groupBy({
+    by: ["businessLinkId", "informationType", "eventType"],
+    where: { ...where, businessLinkId: { not: null }, informationType: { not: null } },
+    _count: { _all: true },
+  });
+  const serviceIds = [...new Set(serviceGroups.map((group) => group.businessLinkId!))];
+  const services = serviceIds.length ? await prisma.businessLink.findMany({
+    where: { businessId, id: { in: serviceIds } }, select: { id: true, label: true },
+  }) : [];
+  return {
+    ...buildAnalyticsResult(counts, sourceCounts, dailySeries, linkCounts, links),
+    serviceAccess: serviceGroups.map((group) => ({
+      serviceId: group.businessLinkId!, label: services.find((service) => service.id === group.businessLinkId)?.label ?? "Servicio eliminado",
+      informationType: group.informationType!, eventType: group.eventType, count: group._count._all,
+    })),
+  };
 }
 
 export async function countAllInteractions() {

@@ -4,6 +4,10 @@ A local-first SaaS MVP for NFC and QR smart business pages. The app includes a p
 
 ## Architecture summary
 
+Rich services support device image uploads, expandable galleries, descriptions,
+contacts, social/store links, and per-service content analytics. See
+[service setup and deployment](docs/services.md) before deploying the schema update.
+
 - Public resolver: `/t/[code]`
 - Admin area: `/admin`
 - Business area: `/dashboard`

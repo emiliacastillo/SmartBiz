@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isServiceDestination, serviceImagesSchema, serviceActionsSchema } from "@/lib/service-content";
 
 export const businessSchema = z.object({
   name: z.string().min(2).max(80),
@@ -36,7 +37,10 @@ export const linkSchema = z.object({
     "CUSTOM",
   ]),
   label: z.string().min(1).max(80),
-  url: z.string().min(1).max(500),
+  url: z.string().max(2000).refine((value) => value === "" || isServiceDestination(value)).default(""),
+  description: z.string().max(3000).optional(),
+  images: serviceImagesSchema.optional(),
+  actions: serviceActionsSchema.optional(),
   icon: z.string().max(40).optional().or(z.literal("")),
   position: z.number().int().nonnegative().optional(),
   active: z.boolean().optional(),

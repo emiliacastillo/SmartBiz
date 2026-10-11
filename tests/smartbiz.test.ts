@@ -61,6 +61,7 @@ describe("smart business platform", () => {
     vi.mocked(prisma.interaction.create).mockResolvedValue({
       id: "event-1", businessId: "biz-1", smartTagId: null, businessLinkId: null,
       eventType: "PAGE_VIEW", source: "UNKNOWN", createdAt: date,
+      informationType: null, targetId: null,
     });
     const result = await recordInteraction({ businessId: "biz-1", eventType: "PAGE_VIEW" });
     expect(prisma.interaction.create).toHaveBeenCalledWith({ data: {
@@ -73,6 +74,7 @@ describe("smart business platform", () => {
     vi.mocked(prisma.interaction.groupBy)
       .mockResolvedValueOnce([{ eventType: "PAGE_VIEW", _count: { _all: 4 } }, { eventType: "LINK_CLICK", _count: { _all: 2 } }] as never)
       .mockResolvedValueOnce([{ source: "QR", _count: { _all: 6 } }] as never)
+      .mockResolvedValueOnce([])
       .mockResolvedValueOnce([]);
     vi.mocked(prisma.$queryRaw).mockResolvedValue([]);
     const analytics = await aggregateBusinessAnalytics("biz-1", 7);

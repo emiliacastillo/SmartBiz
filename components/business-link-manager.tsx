@@ -6,6 +6,8 @@ import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { BusinessLinkRecord } from "@/lib/data-store";
+import { ServiceContentEditor } from "@/components/service-content-editor";
+import { linkSchema } from "@/lib/validators";
 
 const linkTypes = [
   ["MENU", "Menu"],
@@ -37,6 +39,7 @@ export function BusinessLinkManager({
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [uploading, setUploading] = useState(false);
 
   function openCreateForm() {
     setEditingLink(null);
@@ -58,6 +61,7 @@ export function BusinessLinkManager({
 
   async function saveLink(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (uploading) return;
     const formData = new FormData(event.currentTarget);
     const type = String(formData.get("type")) as LinkType;
     const payload = {
@@ -65,10 +69,18 @@ export function BusinessLinkManager({
       type,
       label: String(formData.get("label") ?? "").trim(),
       url: String(formData.get("url") ?? "").trim(),
+      description: String(formData.get("description") ?? "").trim(),
+      images: JSON.parse(String(formData.get("images") ?? "[]")),
+      actions: JSON.parse(String(formData.get("actions") ?? "[]")),
       icon: String(formData.get("icon") ?? "link").trim() || "link",
       position: editingLink?.position ?? (Math.max(0, ...links.map((link) => link.position)) + 1),
       active: true,
     };
+    const validated = linkSchema.safeParse(payload);
+    if (!validated.success) {
+      setError(validated.error.issues.map((issue) => issue.message).join(". "));
+      return;
+    }
 
     startTransition(async () => {
       try {
@@ -138,12 +150,17 @@ export function BusinessLinkManager({
           </label>
           <label className="grid gap-1.5 text-sm font-medium text-slate-700 sm:col-span-2">
             Destination URL or phone
-            <Input name="url" defaultValue={formValues.url} maxLength={500} placeholder="https://... or tel:+1..." required />
+            <Input name="url" defaultValue={formValues.url} maxLength={2000} placeholder="https://... or tel:+1... (opcional)" />
           </label>
+          <label className="grid gap-1.5 text-sm font-medium text-slate-700 sm:col-span-2">
+            Descripción del servicio
+            <textarea name="description" defaultValue={editingLink?.description ?? ""} maxLength={3000} rows={4} className="rounded-md border border-slate-300 bg-white p-3" />
+          </label>
+          <ServiceContentEditor key={editingLink?.id ?? "new"} businessId={businessId} initialImages={editingLink?.images} initialActions={editingLink?.actions} onUploadingChange={setUploading} />
           <input type="hidden" name="icon" value={formValues.icon} />
           <div className="flex flex-wrap gap-2 sm:col-span-2">
-            <Button type="submit" disabled={isPending}>{isPending ? "Saving..." : editingLink ? "Save changes" : "Add to smart page"}</Button>
-            <Button type="button" variant="outline" onClick={closeForm} disabled={isPending}>
+            <Button type="submit" disabled={isPending || uploading}>{isPending ? "Saving..." : editingLink ? "Save changes" : "Add to smart page"}</Button>
+            <Button type="button" variant="outline" onClick={closeForm} disabled={isPending || uploading}>
               <X size={16} aria-hidden="true" /> Cancel
             </Button>
           </div>

@@ -29,6 +29,9 @@ enum EventType {
   PAGE_VIEW
   LINK_CLICK
   PROMOTION_CLICK
+  SERVICE_VIEW
+  IMAGE_VIEW
+  IMAGE_EXPAND
 }
 
 enum SourceType {
@@ -67,6 +70,17 @@ model Business {
   links       BusinessLink[]
   promotions  Promotion[]
   interactions Interaction[]
+  media UploadedImage[]
+}
+
+model UploadedImage {
+  id String @id @default(cuid())
+  businessId String
+  content Bytes
+  contentType String
+  createdAt DateTime @default(now())
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  @@index([businessId])
 }
 
 model BusinessMembership {
@@ -109,6 +123,9 @@ model BusinessLink {
   type      LinkType
   label     String
   url       String
+  description String @default("")
+  images    Json @default("[]")
+  actions   Json @default("[]")
   icon      String?
   position  Int      @default(0)
   active    Boolean  @default(true)
@@ -159,6 +176,8 @@ model Interaction {
   businessLinkId String?
   eventType     EventType
   source        SourceType  @default(UNKNOWN)
+  informationType String?
+  targetId      String?
   createdAt     DateTime    @default(now())
 
   business    Business     @relation(fields: [businessId], references: [id], onDelete: Cascade)
@@ -168,4 +187,5 @@ model Interaction {
   @@index([businessId, createdAt])
   @@index([smartTagId])
   @@index([businessLinkId])
+  @@index([businessId, businessLinkId, createdAt])
 }

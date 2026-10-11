@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ServiceCard } from "@/components/service-card";
 
 import type { BusinessRecord, BusinessLinkRecord, PromotionRecord } from "@/lib/data-store";
 import { ArrowUpRight, MapPin, Phone, Star, Globe, Sparkles, CalendarClock, Link2, Utensils, MessageCircle, Gift, CalendarCheck2, Scissors } from "lucide-react";
@@ -178,7 +179,7 @@ export function SmartPageLayout({
 
           <section className="space-y-3">
             {links.map((link) => (
-              <SmartLinkButton key={link.id} link={link} tagCode={tagCode} source={source} />
+              <ServiceCard key={link.id} link={link} tagCode={tagCode} source={source} />
             ))}
           </section>
         </main>

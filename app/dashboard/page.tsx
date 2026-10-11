@@ -1,3 +1,4 @@
+import { informationLabel } from "@/lib/service-content";
 import { redirect } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -131,6 +132,19 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
+          <Card className="lg:col-span-2">
+            <CardHeader><CardTitle>Contenido consultado por servicio</CardTitle></CardHeader>
+            <CardContent>
+              <p className="mb-4 text-sm text-slate-500">Interacciones en el período seleccionado; no representan clientes únicos.</p>
+              {analytics.serviceAccess?.length ? <div className="overflow-x-auto"><table className="w-full text-left text-sm">
+                <thead><tr><th className="p-2">Servicio</th><th className="p-2">Información</th><th className="p-2">Acción</th><th className="p-2">Accesos</th></tr></thead>
+                <tbody>{analytics.serviceAccess.map((row) => <tr key={`${row.serviceId}-${row.informationType}-${row.eventType}`} className="border-t">
+                  <td className="p-2">{row.label}</td><td className="p-2">{informationLabel(row.informationType)}</td>
+                  <td className="p-2">{({ SERVICE_VIEW: "Abrir descripción", IMAGE_VIEW: "Ver imagen", IMAGE_EXPAND: "Ampliar imagen", LINK_CLICK: "Abrir enlace/contacto" } as Record<string, string>)[row.eventType] ?? row.eventType}</td><td className="p-2">{row.count}</td>
+                </tr>)}</tbody>
+              </table></div> : <p className="text-sm text-slate-500">Todavía no hay consultas de servicios en este período.</p>}
+            </CardContent>
+          </Card>
           <Card>
             <CardHeader><CardTitle>Assigned devices</CardTitle></CardHeader>
             <CardContent className="space-y-3">

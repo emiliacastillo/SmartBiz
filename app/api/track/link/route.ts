@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { getAppStore, recordInteraction } from "@/lib/data-store";
+import { recordInteraction } from "@/lib/data-store";
+import { resolveTrackedService } from "@/lib/service-tracking";
+import { primaryInformationType } from "@/lib/service-content";
 import { isSafeExternalUrl } from "@/lib/utils";
 
 export async function GET(request: Request) {
@@ -14,13 +16,15 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Missing linkId" }, { status: 400 });
   }
 
-  const store = await getAppStore();
-  const link = store.links.find((item) => item.id === linkId && item.active);
-  if (!link) {
+  const resolved = await resolveTrackedService(linkId, tagCode);
+  if (!resolved) {
     return NextResponse.json({ error: "Link not found" }, { status: 404 });
   }
 
-  const tag = tagCode ? store.tags.find((item) => item.code === tagCode.toUpperCase()) : undefined;
+  const { link, tag } = resolved;
+  if (!isSafeExternalUrl(link.url)) {
+    return NextResponse.json({ error: "Unsafe destination" }, { status: 400 });
+  }
 
   await recordInteraction({
     businessId: link.businessId,
@@ -28,11 +32,8 @@ export async function GET(request: Request) {
     businessLinkId: link.id,
     eventType: "LINK_CLICK",
     source,
+    informationType: primaryInformationType(link.type, link.url),
   });
-
-  if (!isSafeExternalUrl(link.url)) {
-    return NextResponse.json({ error: "Unsafe destination" }, { status: 400 });
-  }
 
   return NextResponse.redirect(link.url);
 }

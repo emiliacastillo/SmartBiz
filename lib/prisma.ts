@@ -1,7 +1,9 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient; prismaSchema?: string };
+// Hot reload can retain a client created before new fields were generated.
+const prismaSchema = JSON.stringify(Prisma.dmmf.datamodel);
 
 function getConnectionString() {
   const connectionString = process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/smartbiz?schema=public";
@@ -14,7 +16,7 @@ function getConnectionString() {
   return connectionUrl.toString();
 }
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({
+export const prisma = (globalForPrisma.prismaSchema === prismaSchema ? globalForPrisma.prisma : undefined) ?? new PrismaClient({
   adapter: new PrismaPg({
     connectionString: getConnectionString(),
   }),
@@ -22,4 +24,5 @@ export const prisma = globalForPrisma.prisma ?? new PrismaClient({
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
+  globalForPrisma.prismaSchema = prismaSchema;
 }
