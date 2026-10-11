@@ -32,7 +32,7 @@ This starts PostgreSQL with the settings in `.env`:
 ```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/smartbiz?schema=public"
 DIRECT_URL="postgresql://postgres:postgres@localhost:5432/smartbiz?schema=public"
-NEXT_PUBLIC_DEMO_MODE="false"
+DEMO_MODE="false"
 ```
 
 To confirm the container is running:
@@ -79,13 +79,13 @@ This loads a real set of sample businesses, links, tags, promotions, and interac
 The app can be controlled via environment variables:
 
 ```env
-NEXT_PUBLIC_DEMO_MODE="false"
+DEMO_MODE="false"
 ```
 
 - `true`: uses the in-memory demo store
 - `false`: uses the real PostgreSQL-backed app data
 
-Set `NEXT_PUBLIC_APP_URL` to the public origin used by the deployment so generated smart-tag URLs point to the deployed app. Locally, keep it as `http://localhost:3000`.
+Set `APP_URL` to the public origin used by the deployment so generated smart-tag URLs point to the deployed app. Locally, keep it as `http://localhost:3000`.
 
 ### 6) Start the app
 

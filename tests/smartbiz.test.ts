@@ -4,15 +4,15 @@ import { aggregateBusinessAnalytics } from "@/lib/analytics";
 import { getBusinessById, getTagByCode, getDemoStore, getTagBusinessLinks, recordInteraction, resolveSmartTag, setSmartTagLinkAssignments } from "@/lib/demo-store";
 import { generateTagCode, isSafeExternalUrl } from "@/lib/utils";
 
-const originalDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE;
+const originalDemoMode = process.env.DEMO_MODE;
 
 beforeAll(() => {
-  process.env.NEXT_PUBLIC_DEMO_MODE = "true";
+  process.env.DEMO_MODE = "true";
 });
 
 afterAll(() => {
-  if (originalDemoMode === undefined) delete process.env.NEXT_PUBLIC_DEMO_MODE;
-  else process.env.NEXT_PUBLIC_DEMO_MODE = originalDemoMode;
+  if (originalDemoMode === undefined) delete process.env.DEMO_MODE;
+  else process.env.DEMO_MODE = originalDemoMode;
 });
 
 describe("smart business platform", () => {

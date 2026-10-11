@@ -6,15 +6,15 @@ const envSchema = z.object({
   AUTH_SECRET: z.string().default("smartbiz-local-secret"),
   ADMIN_EMAIL: z.string().default("admin@smartbiz.local"),
   ADMIN_PASSWORD: z.string().default("admin123"),
-  NEXT_PUBLIC_APP_URL: z.string().default("http://localhost:3000"),
-  NEXT_PUBLIC_DEMO_MODE: z.string().default("true"),
+  APP_URL: z.string().default("http://localhost:3000"),
+  DEMO_MODE: z.string().default("true"),
 });
 
 export const appEnv = envSchema.parse({
   ...process.env,
-  NEXT_PUBLIC_DEMO_MODE: process.env.NEXT_PUBLIC_DEMO_MODE ?? "true",
+  DEMO_MODE: process.env.DEMO_MODE ?? "true",
 });
 
 export function isDemoModeEnabled() {
-  return ["true", "1", "yes", "on"].includes((process.env.NEXT_PUBLIC_DEMO_MODE ?? appEnv.NEXT_PUBLIC_DEMO_MODE ?? "true").toLowerCase());
+  return ["true", "1", "yes", "on"].includes((process.env.DEMO_MODE ?? appEnv.DEMO_MODE ?? "true").toLowerCase());
 }
