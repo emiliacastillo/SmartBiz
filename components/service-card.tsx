@@ -24,13 +24,13 @@ export function ServiceCard({ link, tagCode, source = "unknown" }: {
   }
   const controls = link.images.length > 1 ? (
     <div className="flex items-center justify-between gap-3 p-3">
-      <button type="button" onClick={() => move(-1)} aria-label={`Imagen anterior de ${link.label}`} className="rounded-lg border px-4 py-2">←</button>
+      <button type="button" onClick={() => move(-1)} aria-label={`Previous image for ${link.label}`} className="rounded-lg border px-4 py-2">←</button>
       <span aria-live="polite">{index + 1} / {link.images.length}</span>
-      <button type="button" onClick={() => move(1)} aria-label={`Imagen siguiente de ${link.label}`} className="rounded-lg border px-4 py-2">→</button>
+      <button type="button" onClick={() => move(1)} aria-label={`Next image for ${link.label}`} className="rounded-lg border px-4 py-2">→</button>
     </div>
   ) : null;
   const imageActions = image?.actions?.length ? (
-    <div className="flex flex-wrap gap-2 p-3" aria-label="Enlaces y contactos de esta imagen">
+    <div className="flex flex-wrap gap-2 p-3" aria-label="Links and contacts for this image">
       {image.actions.map((action) => <a key={action.id} href={action.url}
         target={/^https?:/.test(action.url) ? "_blank" : undefined} rel="noopener noreferrer"
         onClick={() => track("LINK_CLICK", action.id, image.id)}
@@ -41,8 +41,8 @@ export function ServiceCard({ link, tagCode, source = "unknown" }: {
   ) : null;
   return (
     <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      {image ? <section aria-label={`Galería de ${link.label}`} aria-roledescription="carrusel">
-        <button type="button" className="block w-full" aria-label={`Ampliar imagen de ${link.label}`} onClick={() => { dialog.current?.showModal(); track("IMAGE_EXPAND", image.id); }}>
+      {image ? <section aria-label={`Gallery for ${link.label}`} aria-roledescription="carousel">
+        <button type="button" className="block w-full" aria-label={`Expand image for ${link.label}`} onClick={() => { dialog.current?.showModal(); track("IMAGE_EXPAND", image.id); }}>
           <Image src={image.url} alt={image.description || link.label} width={800} height={500} unoptimized className="h-56 w-full object-cover" />
         </button>
         {controls}
@@ -52,7 +52,7 @@ export function ServiceCard({ link, tagCode, source = "unknown" }: {
       <div className="space-y-3 p-4">
         <h3 className="text-lg font-semibold">{link.label}</h3>
         {link.description ? <details onToggle={(event) => { if (event.currentTarget.open) track("SERVICE_VIEW"); }}>
-          <summary className="cursor-pointer font-medium text-slate-700">Ver descripción</summary>
+          <summary className="cursor-pointer font-medium text-slate-700">View description</summary>
           <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600">{link.description}</p>
         </details> : null}
         <div className="flex flex-wrap gap-2">
@@ -62,8 +62,8 @@ export function ServiceCard({ link, tagCode, source = "unknown" }: {
           </a>)}
         </div>
       </div>
-      <dialog ref={dialog} aria-label={`Imagen ampliada de ${link.label}`} className="m-auto max-h-[95dvh] w-[95vw] max-w-4xl overflow-auto rounded-2xl p-4 backdrop:bg-black/80">
-        <button type="button" onClick={() => dialog.current?.close()} className="mb-3 rounded-lg border px-4 py-2">Cerrar imagen</button>
+      <dialog ref={dialog} aria-label={`Expanded image for ${link.label}`} className="m-auto max-h-[95dvh] w-[95vw] max-w-4xl overflow-auto rounded-2xl p-4 backdrop:bg-black/80">
+        <button type="button" onClick={() => dialog.current?.close()} className="mb-3 rounded-lg border px-4 py-2">Close image</button>
         {image ? <Image src={image.url} alt={image.description || link.label} width={1400} height={1000} unoptimized className="max-h-[70dvh] w-full object-contain" /> : null}
         {controls}
         <p>{image?.description}</p>

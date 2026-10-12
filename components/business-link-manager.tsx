@@ -150,10 +150,10 @@ export function BusinessLinkManager({
           </label>
           <label className="grid gap-1.5 text-sm font-medium text-slate-700 sm:col-span-2">
             Destination URL or phone
-            <Input name="url" defaultValue={formValues.url} maxLength={2000} placeholder="https://... or tel:+1... (opcional)" />
+            <Input name="url" defaultValue={formValues.url} maxLength={2000} placeholder="https://... or tel:+1... (optional)" />
           </label>
           <label className="grid gap-1.5 text-sm font-medium text-slate-700 sm:col-span-2">
-            Descripción del servicio
+            Service description
             <textarea name="description" defaultValue={editingLink?.description ?? ""} maxLength={3000} rows={4} className="rounded-md border border-slate-300 bg-white p-3" />
           </label>
           <ServiceContentEditor key={editingLink?.id ?? "new"} businessId={businessId} initialImages={editingLink?.images} initialActions={editingLink?.actions} onUploadingChange={setUploading} />

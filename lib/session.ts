@@ -9,7 +9,6 @@ export type SessionUser = {
 };
 
 const SESSION_COOKIE = "smartbiz_session";
-const DEFAULT_SECRET = "smartbiz-demo-secret";
 
 function base64UrlEncode(value: string) {
   return Buffer.from(value).toString("base64url");
@@ -20,7 +19,9 @@ function base64UrlDecode(value: string) {
 }
 
 function getSecret() {
-  return process.env.AUTH_SECRET ?? DEFAULT_SECRET;
+  const secret = process.env.AUTH_SECRET;
+  if (!secret) throw new Error("AUTH_SECRET must be configured");
+  return secret;
 }
 
 function signData(payload: Record<string, unknown>) {

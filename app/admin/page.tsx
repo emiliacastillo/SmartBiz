@@ -52,6 +52,7 @@ export default async function AdminPage() {
                   <p className="text-sm text-slate-500">/{business.slug}</p>
                 </div>
                 <div className="flex gap-3">
+                  <Link href={`/admin/rewards?businessId=${business.id}`}><Button variant="outline">Rewards & promotions</Button></Link>
                   <Link href={`/dashboard?businessId=${business.id}`}><Button variant="secondary">Dashboard</Button></Link>
                   {tagsByBusinessId.get(business.id)?.[0] ? <Link href={`/t/${tagsByBusinessId.get(business.id)?.[0].code}`}><Button variant="outline">Preview</Button></Link> : null}
                 </div>

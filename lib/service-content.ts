@@ -2,12 +2,12 @@ import { z } from "zod";
 
 export const actionTypes = ["LINK", "PHONE", "EMAIL", "WHATSAPP", "SOCIAL", "STORE"] as const;
 export const actionLabels: Record<(typeof actionTypes)[number], string> = {
-  LINK: "Enlace", PHONE: "Teléfono", EMAIL: "Correo", WHATSAPP: "WhatsApp", SOCIAL: "Red social", STORE: "Tienda",
+  LINK: "Link", PHONE: "Phone", EMAIL: "Email", WHATSAPP: "WhatsApp", SOCIAL: "Social media", STORE: "Store",
 };
 
 export function informationLabel(type: string) {
-  const labels: Record<string, string> = { ...actionLabels, DESCRIPTION: "Descripción", IMAGE: "Imagen" };
-  return type.startsWith("IMAGE_") ? `Imagen: ${labels[type.slice(6)] ?? type.slice(6)}` : labels[type] ?? type;
+  const labels: Record<string, string> = { ...actionLabels, DESCRIPTION: "Description", IMAGE: "Image" };
+  return type.startsWith("IMAGE_") ? `Image: ${labels[type.slice(6)] ?? type.slice(6)}` : labels[type] ?? type;
 }
 
 export function isServiceDestination(value: string) {
@@ -18,16 +18,16 @@ export function isServiceDestination(value: string) {
 export const serviceActionSchema = z.object({
   id: z.string().min(1).max(100), type: z.enum(actionTypes),
   label: z.string().trim().min(1).max(80),
-  url: z.string().max(2000).refine(isServiceDestination, "Destino no válido"),
+  url: z.string().max(2000).refine(isServiceDestination, "Invalid destination"),
 }).refine(({ type, url }) => type === "PHONE" ? url.startsWith("tel:")
-  : type === "EMAIL" ? url.startsWith("mailto:") : /^https?:\/\//.test(url), "El destino no coincide con el tipo de acción");
+  : type === "EMAIL" ? url.startsWith("mailto:") : /^https?:\/\//.test(url), "The destination does not match the action type");
 export const serviceActionsSchema = z.array(serviceActionSchema).max(20).refine((items) => new Set(items.map((item) => item.id)).size === items.length);
 export const serviceImageSchema = z.object({
   id: z.string().min(1).max(100),
   url: z.string().max(2000).refine((value) => {
     if (/^\/api\/media\/[a-zA-Z0-9-]+$/.test(value)) return true;
     try { return new URL(value).protocol === "https:"; } catch { return false; }
-  }, "Usa una imagen HTTPS o una imagen subida"),
+  }, "Use an HTTPS image or an uploaded image"),
   description: z.string().max(500),
   actions: serviceActionsSchema.optional(),
 });

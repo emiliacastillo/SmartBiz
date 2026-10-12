@@ -71,6 +71,7 @@ model Business {
   promotions  Promotion[]
   interactions Interaction[]
   media UploadedImage[]
+  contacts CustomerContact[]
 }
 
 model UploadedImage {
@@ -163,10 +164,59 @@ model Promotion {
   endsAt         DateTime?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+  kind           String    @default("PROMOTION")
+  terms          String    @default("")
+  entryEnabled   Boolean   @default(false)
+  awardMode      String    @default("MANUAL")
+  winnerLimit    Int       @default(1)
+  entryLimit     Int       @default(1000)
+  serviceIds     String[]  @default([])
+  redemptionEndsAt DateTime?
+  archivedAt     DateTime?
+  entries        RewardEntry[]
 
   business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId, active])
+}
+
+model CustomerContact {
+  id String @id @default(cuid())
+  businessId String
+  name String
+  email String
+  phone String
+  emailMarketingConsent Boolean @default(false)
+  smsMarketingConsent Boolean @default(false)
+  consentUpdatedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  entries RewardEntry[]
+  @@unique([businessId, email])
+}
+
+model RewardEntry {
+  id String @id @default(cuid())
+  promotionId String
+  contactId String
+  publicToken String @unique
+  status String @default("PENDING")
+  redemptionCode String @unique
+  termsSnapshot String
+  serviceIds String[]
+  emailNoticeConsent Boolean @default(false)
+  smsNoticeConsent Boolean @default(false)
+  consentVersion String @default("rewards-v1")
+  emailNoticeState String @default("PENDING")
+  smsNoticeState String @default("PENDING")
+  createdAt DateTime @default(now())
+  awardedAt DateTime?
+  redeemedAt DateTime?
+  redeemedServiceId String?
+  promotion Promotion @relation(fields: [promotionId], references: [id], onDelete: Restrict)
+  contact CustomerContact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  @@unique([promotionId, contactId])
+  @@index([promotionId, status])
 }
 
 model Interaction {

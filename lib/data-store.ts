@@ -65,6 +65,11 @@ export type PromotionRecord = {
   active: boolean;
   startsAt?: string;
   endsAt?: string;
+  kind?: string;
+  terms?: string;
+  entryEnabled?: boolean;
+  awardMode?: string;
+  redemptionEndsAt?: string;
 };
 
 export type InteractionRecord = {
@@ -146,6 +151,8 @@ function toPromotionRecord(record: Promotion): PromotionRecord {
     active: record.active,
     startsAt: record.startsAt?.toISOString(),
     endsAt: record.endsAt?.toISOString(),
+    kind: record.kind, terms: record.terms, entryEnabled: record.entryEnabled,
+    awardMode: record.awardMode, redemptionEndsAt: record.redemptionEndsAt?.toISOString(),
   };
 }
 
@@ -228,7 +235,10 @@ export async function setSmartTagLinkAssignments(tagId: string, linkIds: string[
 
 export async function getBusinessPromotions(businessId: string): Promise<PromotionRecord[]> {
   const promotions = await prisma.promotion.findMany({
-    where: { businessId, active: true },
+    where: { businessId, active: true, archivedAt: null, AND: [
+      { OR: [{ startsAt: null }, { startsAt: { lte: new Date() } }] },
+      { OR: [{ endsAt: null }, { endsAt: { gt: new Date() } }] },
+    ] },
     orderBy: { createdAt: "desc" },
   });
   return promotions.map(toPromotionRecord);

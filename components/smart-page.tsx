@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { ServiceCard } from "@/components/service-card";
+import { CampaignCard } from "@/components/campaign-card";
 
 import type { BusinessRecord, BusinessLinkRecord, PromotionRecord } from "@/lib/data-store";
 import { ArrowUpRight, MapPin, Phone, Star, Globe, Sparkles, CalendarClock, Link2, Utensils, MessageCircle, Gift, CalendarCheck2, Scissors } from "lucide-react";
@@ -168,10 +169,10 @@ export function SmartPageLayout({
 
           {promotions.length > 0 ? (
             <section className="space-y-3">
-              <h2 className="text-lg font-semibold text-slate-900">Featured offers</h2>
+              <h2 className="text-lg font-semibold text-slate-900">Rewards, events & offers</h2>
               <div className="space-y-3">
                 {promotions.map((promotion) => (
-                  <PromotionCard key={promotion.id} promotion={promotion} tagCode={tagCode} source={source} />
+                  <CampaignCard key={promotion.id} promotion={promotion} tagCode={tagCode} source={source} />
                 ))}
               </div>
             </section>

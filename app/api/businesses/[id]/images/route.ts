@@ -19,17 +19,17 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     size += part.value.length;
     if (size > MAX_IMAGE_BYTES + 65536) {
       await reader.cancel();
-      return NextResponse.json({ error: "La imagen no puede superar 2 MB" }, { status: 413 });
+      return NextResponse.json({ error: "Images must not exceed 2 MB" }, { status: 413 });
     }
     chunks.push(part.value);
   }
   const form = await new Response(Buffer.concat(chunks), { headers: { "Content-Type": request.headers.get("content-type") ?? "" } }).formData().catch(() => null);
   const file = form?.get("file");
   if (!(file instanceof File) || file.size === 0) return NextResponse.json({ error: "Missing image" }, { status: 400 });
-  if (file.size > MAX_IMAGE_BYTES) return NextResponse.json({ error: "La imagen no puede superar 2 MB" }, { status: 413 });
+  if (file.size > MAX_IMAGE_BYTES) return NextResponse.json({ error: "Images must not exceed 2 MB" }, { status: 413 });
   const content = new Uint8Array(await file.arrayBuffer());
   const contentType = imageContentType(content);
-  if (!contentType) return NextResponse.json({ error: "Usa JPEG, PNG o WebP" }, { status: 400 });
+  if (!contentType) return NextResponse.json({ error: "Use JPEG, PNG or WebP" }, { status: 400 });
   const image = await prisma.uploadedImage.create({ data: { businessId: id, content, contentType }, select: { id: true } });
   return NextResponse.json({ id: image.id, url: `/api/media/${image.id}` }, { status: 201 });
 }

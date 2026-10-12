@@ -1,4 +1,5 @@
 import { informationLabel } from "@/lib/service-content";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,7 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-600">Business dashboard</p>
             <h1 className="text-3xl font-bold">{business.name}</h1>
+            {user.role === "admin" ? <Link href={`/admin/rewards?businessId=${business.id}`} className="mt-2 inline-block text-sm font-semibold text-orange-700">Manage rewards & promotions →</Link> : null}
           </div>
           <form action="/api/logout" method="POST">
             <Button type="submit" variant="outline">Sign out</Button>
@@ -133,16 +135,16 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
           <Card className="lg:col-span-2">
-            <CardHeader><CardTitle>Contenido consultado por servicio</CardTitle></CardHeader>
+            <CardHeader><CardTitle>Content accessed by service</CardTitle></CardHeader>
             <CardContent>
-              <p className="mb-4 text-sm text-slate-500">Interacciones en el período seleccionado; no representan clientes únicos.</p>
+              <p className="mb-4 text-sm text-slate-500">Interactions during the selected period; these are not unique customers.</p>
               {analytics.serviceAccess?.length ? <div className="overflow-x-auto"><table className="w-full text-left text-sm">
-                <thead><tr><th className="p-2">Servicio</th><th className="p-2">Información</th><th className="p-2">Acción</th><th className="p-2">Accesos</th></tr></thead>
+                <thead><tr><th className="p-2">Service</th><th className="p-2">Information</th><th className="p-2">Action</th><th className="p-2">Interactions</th></tr></thead>
                 <tbody>{analytics.serviceAccess.map((row) => <tr key={`${row.serviceId}-${row.informationType}-${row.eventType}`} className="border-t">
                   <td className="p-2">{row.label}</td><td className="p-2">{informationLabel(row.informationType)}</td>
-                  <td className="p-2">{({ SERVICE_VIEW: "Abrir descripción", IMAGE_VIEW: "Ver imagen", IMAGE_EXPAND: "Ampliar imagen", LINK_CLICK: "Abrir enlace/contacto" } as Record<string, string>)[row.eventType] ?? row.eventType}</td><td className="p-2">{row.count}</td>
+                  <td className="p-2">{({ SERVICE_VIEW: "Open description", IMAGE_VIEW: "View image", IMAGE_EXPAND: "Expand image", LINK_CLICK: "Open link/contact" } as Record<string, string>)[row.eventType] ?? row.eventType}</td><td className="p-2">{row.count}</td>
                 </tr>)}</tbody>
-              </table></div> : <p className="text-sm text-slate-500">Todavía no hay consultas de servicios en este período.</p>}
+              </table></div> : <p className="text-sm text-slate-500">No service interactions in this period yet.</p>}
             </CardContent>
           </Card>
           <Card>

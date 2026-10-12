@@ -20,14 +20,14 @@ it("cycles images, opens an accessible modal, and reports the selected image and
   ], actions: [{ id: "shop", type: "STORE", label: "Comprar", url: "https://example.com/shop" }] } as BusinessLinkRecord;
   render(createElement(ServiceCard, { link, tagCode: "CODE", source: "qr" }));
   expect(screen.queryByRole("link", { name: /Consultar esta imagen/ })).toBeNull();
-  fireEvent.click(screen.getByRole("button", { name: "Imagen siguiente de Masaje" }));
+  fireEvent.click(screen.getByRole("button", { name: "Next image for Masaje" }));
   expect(screen.getByRole("img").getAttribute("alt")).toBe("Tratamiento");
-  fireEvent.click(screen.getByRole("button", { name: "Ampliar imagen de Masaje" }));
+  fireEvent.click(screen.getByRole("button", { name: "Expand image for Masaje" }));
   expect(screen.getByRole("dialog").getAttribute("open")).toBe("");
   const contact = screen.getAllByRole("link", { name: /Consultar esta imagen/ }).at(-1)!;
   expect(contact.getAttribute("href")).toBe("mailto:contact@example.test");
   fireEvent.click(contact);
-  fireEvent.click(screen.getByRole("button", { name: "Cerrar imagen" }));
+  fireEvent.click(screen.getByRole("button", { name: "Close image" }));
   expect(screen.queryByRole("dialog")).toBeNull();
   fireEvent.click(screen.getByRole("link", { name: /Comprar/ }));
   await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(4));

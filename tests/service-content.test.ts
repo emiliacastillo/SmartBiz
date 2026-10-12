@@ -5,7 +5,7 @@ import { POST } from "@/app/api/track/service/route";
 import { getAppStore, recordInteraction, type AppStore } from "@/lib/data-store";
 
 vi.mock("@/lib/data-store", () => ({ getAppStore: vi.fn(), recordInteraction: vi.fn() }));
-const base = { businessId: "biz", type: "CUSTOM", label: "Servicio", url: "" };
+const base = { businessId: "biz", type: "CUSTOM", label: "Service", url: "" };
 let store: AppStore;
 beforeEach(() => {
   vi.resetAllMocks();

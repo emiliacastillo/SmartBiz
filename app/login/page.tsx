@@ -15,11 +15,11 @@ export default function LoginPage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" defaultValue="admin@smartbiz.local" required />
+              <Input id="email" name="email" type="email" autoComplete="username" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" name="password" type="password" defaultValue="admin123" required />
+              <Input id="password" name="password" type="password" autoComplete="current-password" required />
             </div>
             <Button type="submit" className="w-full">Continue</Button>
           </CardContent>

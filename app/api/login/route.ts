@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   const email = String(form.get("email") ?? "");
   const password = String(form.get("password") ?? "");
 
-  if (email === appEnv.ADMIN_EMAIL && password === appEnv.ADMIN_PASSWORD) {
+  if (appEnv.ADMIN_EMAIL && appEnv.ADMIN_PASSWORD && email === appEnv.ADMIN_EMAIL && password === appEnv.ADMIN_PASSWORD) {
     await setSessionCookie({ id: "admin-user", email, role: "admin" });
     return NextResponse.redirect(new URL("/admin", request.url), 303);
   }

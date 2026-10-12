@@ -105,7 +105,7 @@ export async function aggregateBusinessAnalytics(businessId: string, requestedDa
   return {
     ...buildAnalyticsResult(counts, sourceCounts, dailySeries, linkCounts, links),
     serviceAccess: serviceGroups.map((group) => ({
-      serviceId: group.businessLinkId!, label: services.find((service) => service.id === group.businessLinkId)?.label ?? "Servicio eliminado",
+      serviceId: group.businessLinkId!, label: services.find((service) => service.id === group.businessLinkId)?.label ?? "Deleted service",
       informationType: group.informationType!, eventType: group.eventType, count: group._count._all,
     })),
   };
